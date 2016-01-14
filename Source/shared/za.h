@@ -6,9 +6,9 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        10 Jan 2016
+*  DATE:        14 Jan 2016
 *
-*  ZeroAccess common structures and definitions.
+*  ZeroAccess common structures and definitions used within all projects.
 *
 * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -34,9 +34,10 @@ typedef struct _ZA_PACKETHEADER {
 } ZA_PACKETHEADER, *PZA_PACKETHEADER;
 
 typedef struct _ZA_FILEHEADER {
-	ULONG   Name;
-	ULONG   Time;
-	ULONG   Size;
+	ULONG	Name;
+	ULONG	Time;
+	ULONG	Size;
+	BYTE	Signature[128];
 } ZA_FILEHEADER, *PZA_FILEHEADER;
 
 typedef struct _ZA_PACKET {
@@ -53,3 +54,11 @@ typedef struct _ZA_CALLHOME {
 	ULONG   AffId;
 	ULONG   CRC; //CRC32
 } ZA_CALLHOME, *PZA_CALLHOME;
+
+typedef struct _ZA_OP_CONTEXT {
+	PZA_PEERINFO List32;
+	ULONG nList32;
+	PZA_PEERINFO List64;
+	ULONG nList64;
+	HANDLE ProcessHeap;
+} ZA_OP_CONTEXT, *PZA_OP_CONTEXT;

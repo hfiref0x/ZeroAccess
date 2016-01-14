@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.0
 *
-*  DATE:        11 Jan 2016
+*  DATE:        12 Jan 2016
 *
 *  Common header file for the program support routines.
 *
@@ -45,6 +45,7 @@
 #include <Windows.h>
 #include <ntstatus.h>
 #include <process.h>
+#include <intrin.h>
 
 #include "..\minirtl\minirtl.h"
 #include "..\minirtl\_filename.h"
@@ -54,6 +55,8 @@
 #include "za.h"
 #include "util.h"
 #include "md5.h"
+#include "za_rkey.h"
+//#include "ldr.h"
 //#include "p2p.h"
 //#include "inject.h"
 //#include "uac.h"

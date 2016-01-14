@@ -35,36 +35,6 @@ BOOL g_ConsoleOutput = FALSE;
 #define T_SFDECRYPTFAIL  L"\r\nError while decrypting file"
 #define T_SFPRESSANYKEY  L"\r\nPress Enter to exit"
 
-PBYTE SfQueryEncryptedData(
-	PVOID DllHandle,
-	PULONG DataSize
-	)
-{
-	NTSTATUS                   status;
-	ULONG_PTR                  IdPath[3];
-	IMAGE_RESOURCE_DATA_ENTRY  *DataEntry;
-	PBYTE                      Data = NULL;
-	ULONG                      SizeOfData = 0;
-	
-	if (DllHandle != NULL) {
-
-		IdPath[0] = (ULONG_PTR)RT_RCDATA; //type
-		IdPath[1] = 2;                    //id
-		IdPath[2] = 0;                    //lang
-
-		status = LdrFindResource_U(DllHandle, (ULONG_PTR*)&IdPath, 3, &DataEntry);
-		if (NT_SUCCESS(status)) {
-			status = LdrAccessResource(DllHandle, DataEntry, &Data, &SizeOfData);
-			if (NT_SUCCESS(status)) {
-				if (DataSize) {
-					*DataSize = SizeOfData;
-				}
-			}
-		}
-	}
-	return Data;
-}
-
 UINT SfDecryptPayload(
 	LPWSTR lpParameter
 	)
@@ -77,11 +47,12 @@ UINT SfDecryptPayload(
 	BCRYPT_KEY_HANDLE   h_rc4key = NULL;
 	NTSTATUS            status;
 	HANDLE              pheap = NULL;
-	PIMAGE_FILE_HEADER	fheader;
+	PIMAGE_FILE_HEADER  fheader;
 	PVOID               pdll = NULL;
 	WCHAR               InputFile[MAX_PATH + 1], OutputFile[MAX_PATH + 1];
 
 	rlen = 0;
+	RtlSecureZeroMemory(InputFile, sizeof(InputFile));
 	GetCommandLineParam(lpParameter, 1, InputFile, MAX_PATH, &rlen);
 	if (rlen == 0) {
 		SfcuiPrintText(g_ConOut,
@@ -103,7 +74,7 @@ UINT SfDecryptPayload(
 			break;
 
 		enc_data_size = 0;
-		enc_data = SfQueryEncryptedData(pdll, &enc_data_size);
+		enc_data = SfuQueryResourceData(2, pdll, &enc_data_size);
 		if (enc_data == NULL)
 			break;
 
@@ -194,7 +165,7 @@ UINT SfDecryptPayload(
 		}
 		else {
 			//failed to extract, drop cab as is
-			if (SfuWriteBufferToFile(OutputFile, decrypted, rlen, FALSE, FALSE) == rlen) {
+			if (SfuWriteBufferToFile(OutputFile, decrypted, enc_data_size, FALSE, FALSE) == enc_data_size) {
 				bSuccess = TRUE;
 			}
 		}

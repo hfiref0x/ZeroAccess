@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        10 Jan 2016
+*  DATE:        14 Jan 2016
 *
 *  ZeroAccess Fast MD5 support routines.
 *
@@ -23,6 +23,14 @@ PMD5Init MD5Init = NULL;
 PMD5Update MD5Update = NULL;
 PMD5Final MD5Final = NULL;
 
+/*
+* SfInitMD5
+*
+* Purpose:
+*
+* Load function pointers for quick MD5.
+*
+*/
 BOOLEAN SfInitMD5(
 	VOID
 	)

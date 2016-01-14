@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        10 Jan 2016
+*  DATE:        14 Jan 2016
 *
 *  ZeroAccess support routines.
 *
@@ -21,24 +21,39 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
+/*
+* SfuDecodeStream
+*
+* Purpose:
+*
+* Decode ZeroAccess stream using given key.
+*
+*/
 VOID SfuDecodeStream(
-	_Inout_ PBYTE Stream,
-	_In_    SIZE_T StreamSize,
-	_In_    DWORD Key
+	_Inout_ unsigned char *stream,
+	_In_ size_t size,
+	_In_ unsigned long key
 	)
 {
-	size_t c = StreamSize >> 2;
-	DWORD *p = (PDWORD)Stream;
-	DWORD k = Key;
+	unsigned long *p = (unsigned long *)stream;
 
-	do {
-		*p ^= k;
-		k = _rotl(k, 1);
+	size >>= 2;
+	while (size > 0) {
+		*p ^= key;
+		key = _rotl(key, 1);
 		p++;
-		--c;
-	} while (c != 0);
+		size--;
+	}
 }
 
+/*
+* SfuWriteBufferToFile
+*
+* Purpose:
+*
+* Create new file (or open existing) and write (append) buffer to it.
+*
+*/
 ULONG_PTR SfuWriteBufferToFile(
 	_In_ PWSTR lpFileName,
 	_In_ PVOID Buffer,
@@ -119,6 +134,14 @@ ULONG_PTR SfuWriteBufferToFile(
 	return BytesWritten;
 }
 
+/*
+* SfuQueryEnvironmentVariableOffset
+*
+* Purpose:
+*
+* Return offset to the given environment variable.
+*
+*/
 LPWSTR SfuQueryEnvironmentVariableOffset(
 	PUNICODE_STRING Value
 	)
@@ -145,6 +168,14 @@ LPWSTR SfuQueryEnvironmentVariableOffset(
 	return (ptr + Value->Length / sizeof(WCHAR));
 }
 
+/*
+* SfuBuildBotPath
+*
+* Purpose:
+*
+* Return full path to bot in both variants.
+*
+*/
 BOOL SfuBuildBotPath(
 	_Inout_ PZA_BOT_PATH Context
 	)
@@ -178,7 +209,6 @@ BOOL SfuBuildBotPath(
 
 		RtlSecureZeroMemory(&sfGUID, sizeof(sfGUID));
 		SfuCalcVolumeMD5((BYTE*)&sfGUID);
-
 
 		status = NtQueryInformationProcess(NtCurrentProcess(), ProcessWow64Information, 
 			&Wow64Information, sizeof(PVOID), NULL);
@@ -300,6 +330,14 @@ BOOL SfuBuildBotPath(
 	return bResult;
 }
 
+/*
+* SfuWhoisInit
+*
+* Purpose:
+*
+* Establish connection with freegeoip whois service.
+*
+*/
 SOCKET SfuWhoisInit(
 	VOID
 	)
@@ -339,6 +377,14 @@ SOCKET SfuWhoisInit(
 	return Socket;
 }
 
+/*
+* SfuWhoisClose
+*
+* Purpose:
+*
+* Close whois request socket.
+*
+*/
 VOID SfuWhoisClose(
 	_In_ SOCKET Socket
 	)
@@ -346,9 +392,16 @@ VOID SfuWhoisClose(
 	if (Socket != INVALID_SOCKET) {
 		closesocket(Socket);
 	}
-	WSACleanup();
 }
 
+/*
+* SfuWhois
+*
+* Purpose:
+*
+* Send whois query and return actual result data as unicode string.
+*
+*/
 BOOL SfuWhois(
 	_In_ UINT_PTR WhoisSocket,
 	_In_ ZA_PEERINFO *Peer,
@@ -423,6 +476,14 @@ BOOL SfuWhois(
 	return bResult;
 }
 
+/*
+* SfuCalcVolumeMD5
+*
+* Purpose:
+*
+* Calculate MD5 from system volume information.
+*
+*/
 BOOLEAN SfuCalcVolumeMD5(
 	_Inout_ PBYTE MD5Hash
 	)
@@ -464,6 +525,14 @@ BOOLEAN SfuCalcVolumeMD5(
 	return result;
 }
 
+/*
+* SfuCreateFileMappingNoExec
+*
+* Purpose:
+*
+* Map file as non executable image.
+*
+*/
 PVOID SfuCreateFileMappingNoExec(
 	_In_ LPWSTR lpFileName
 	)
@@ -516,6 +585,14 @@ PVOID SfuCreateFileMappingNoExec(
 	return Data;
 }
 
+/*
+* SftListThreadPriv
+*
+* Purpose:
+*
+* Test unit for thread elevation check.
+*
+*/
 VOID SftListThreadPriv(
 	VOID
 	)
@@ -564,6 +641,14 @@ VOID SftListThreadPriv(
 	CloseHandle(hToken);
 }
 
+/*
+* SfuGetSystemInfo
+*
+* Purpose:
+*
+* Wrapper for NtQuerySystemInformation.
+*
+*/
 PVOID SfuGetSystemInfo(
 	_In_ SYSTEM_INFORMATION_CLASS InfoClass
 	)
@@ -604,6 +689,14 @@ PVOID SfuGetSystemInfo(
 	return NULL;
 }
 
+/*
+* SfuAdjustCurrentThreadPriv
+*
+* Purpose:
+*
+* Impersonate thread and adjust privileges.
+*
+*/
 BOOL SfuAdjustCurrentThreadPriv(
 	PCLIENT_ID SourceThread
 	)
@@ -678,6 +771,14 @@ BOOL SfuAdjustCurrentThreadPriv(
 	return NT_SUCCESS(status);
 }
 
+/*
+* SfuElevatePriv
+*
+* Purpose:
+*
+* Attempt to elevate current thread privileges by impersonating lsass thread token and adding privilegs next.
+*
+*/
 BOOL SfuElevatePriv(
 	VOID
 	)
@@ -706,7 +807,7 @@ BOOL SfuElevatePriv(
 			if (RtlEqualUnicodeString(&uLookupProcess, &pList->ImageName, TRUE)) {
 
 				for (i = 0; i < pList->ThreadCount; i++) {
-					bResult = SfuAdjustCurrentThreadPriv(&pList->Threads[0].ClientId);
+					bResult = SfuAdjustCurrentThreadPriv(&pList->Threads[i].ClientId);
 					if (bResult)
 						break;
 				}
@@ -724,4 +825,228 @@ BOOL SfuElevatePriv(
 		RtlFreeHeap(NtCurrentPeb()->ProcessHeap, 0, ProcessList);
 
 	return bResult;
+}
+
+/*
+* SfuQueryResourceData
+*
+* Purpose:
+*
+* Load resource by given id (win32 FindResource, SizeofResource, LockResource).
+*
+*/
+PBYTE SfuQueryResourceData(
+	_In_ ULONG_PTR ResourceId,
+	_In_ PVOID DllHandle,
+	_In_ PULONG DataSize
+	)
+{
+	NTSTATUS                   status;
+	ULONG_PTR                  IdPath[3];
+	IMAGE_RESOURCE_DATA_ENTRY  *DataEntry;
+	PBYTE                      Data = NULL;
+	ULONG                      SizeOfData = 0;
+
+	if (DllHandle != NULL) {
+
+		IdPath[0] = (ULONG_PTR)RT_RCDATA; //type
+		IdPath[1] = ResourceId;           //id
+		IdPath[2] = 0;                    //lang
+
+		status = LdrFindResource_U(DllHandle, (ULONG_PTR*)&IdPath, 3, &DataEntry);
+		if (NT_SUCCESS(status)) {
+			status = LdrAccessResource(DllHandle, DataEntry, &Data, &SizeOfData);
+			if (NT_SUCCESS(status)) {
+				if (DataSize) {
+					*DataSize = SizeOfData;
+				}
+			}
+		}
+	}
+	return Data;
+}
+
+/*
+* SfuLoadPeerList
+*
+* Purpose:
+*
+* Load peer list from filename given in win32 format.
+*
+*/
+NTSTATUS SfuLoadPeerList(
+	_In_ OBJECT_ATTRIBUTES *ObjectAttributes,
+	_In_ ZA_PEERINFO **PeerList,
+	_In_ PULONG NumberOfPeers
+	)
+{
+	BOOL                        cond = FALSE;
+	HANDLE                      hFile = NULL;
+	PVOID                       pData = NULL;
+	NTSTATUS                    status = STATUS_UNSUCCESSFUL;
+	IO_STATUS_BLOCK             iost;
+	FILE_STANDARD_INFORMATION   fsi;
+
+	if ((NumberOfPeers == NULL) || (PeerList == NULL))
+		return status;
+
+	do {
+		status = NtOpenFile(&hFile, FILE_READ_ACCESS | SYNCHRONIZE,
+			ObjectAttributes, &iost, FILE_SHARE_READ,
+			FILE_NON_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT);
+
+		if (!NT_SUCCESS(status))
+			break;
+
+		RtlSecureZeroMemory(&fsi, sizeof(fsi));
+		status = NtQueryInformationFile(hFile, &iost, (PVOID)&fsi, sizeof(fsi), FileStandardInformation);
+		if (!NT_SUCCESS(status))
+			break;
+
+		pData = RtlAllocateHeap(NtCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, (SIZE_T)fsi.EndOfFile.LowPart);
+		if (pData == NULL) {
+			status = STATUS_MEMORY_NOT_ALLOCATED;
+			break;
+		}
+
+		if ((fsi.EndOfFile.LowPart % sizeof(ZA_PEERINFO)) != 0) {// incomplete/damaged file
+			status = STATUS_BAD_DATA;
+			break;
+		}
+
+		status = NtReadFile(hFile, NULL, NULL, NULL, &iost, pData, fsi.EndOfFile.LowPart, NULL, NULL);
+		if (NT_SUCCESS(status)) {
+			*NumberOfPeers = (ULONG)(iost.Information / sizeof(ZA_PEERINFO));
+			*PeerList = pData;
+		}
+		else {
+			RtlFreeHeap(NtCurrentPeb()->ProcessHeap, 0, pData);
+			*NumberOfPeers = 0;
+			*PeerList = NULL;
+		}
+
+	} while (cond);
+
+	if (hFile) NtClose(hFile);
+	return status;
+}
+
+/*
+* SfuCreateDirectory
+*
+* Purpose:
+*
+* Native create directory.
+*
+*/
+BOOL SfuCreateDirectory(
+	_In_ OBJECT_ATTRIBUTES *ObjectAttributes
+	)
+{
+	NTSTATUS         status;
+	HANDLE           DirectoryHandle;
+	IO_STATUS_BLOCK  IoStatusBlock;
+
+	status = NtCreateFile(&DirectoryHandle,
+		FILE_GENERIC_WRITE,
+		ObjectAttributes,
+		&IoStatusBlock,
+		NULL,
+		FILE_ATTRIBUTE_NORMAL,//za use hidden+system
+		0,
+		FILE_OPEN_IF,
+		FILE_DIRECTORY_FILE,
+		NULL,
+		0
+		);
+	if (!NT_SUCCESS(status)) {
+		return FALSE;
+	}
+	NtClose(DirectoryHandle);
+	return TRUE;
+}
+
+//@@unimplemented
+BOOL SfuIsDirectoryExists(
+	_In_ PWSTR DirectoryName
+	)
+{
+	UNICODE_STRING   usDirectoryName;
+	NTSTATUS         status;
+	HANDLE           DirectoryHandle;
+	IO_STATUS_BLOCK  IoStatusBlock;
+	OBJECT_ATTRIBUTES ObjectAttributes;
+
+	RtlInitUnicodeString(&usDirectoryName, DirectoryName);
+	InitializeObjectAttributes(&ObjectAttributes, &usDirectoryName, OBJ_CASE_INSENSITIVE, 0, NULL);
+
+	status = NtCreateFile(&DirectoryHandle,
+		SYNCHRONIZE,
+		&ObjectAttributes,
+		&IoStatusBlock,
+		NULL,
+		FILE_ATTRIBUTE_READONLY,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		FILE_OPEN_IF,
+		FILE_DIRECTORY_FILE,
+		NULL,
+		0
+		);
+	if (NT_SUCCESS(status)) {
+		NtClose(DirectoryHandle);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+//move to zacrypto.c
+//@@implemented in harusame
+VOID SfcZAVerifyFile(
+	HCRYPTPROV  hProv,
+	HCRYPTKEY hKey,
+	MD5_CTX *ctx,		
+	PBYTE Image,		
+	DWORD ImageSize		
+	)
+{
+	HCRYPTHASH          lh_hash = 0; 
+	ULONG               CRC, SignSize = 0; 
+	BYTE                e_sign[128];
+	PBYTE               p_resource_sign; 
+	PIMAGE_NT_HEADERS32 phdr; 
+
+	phdr = (PIMAGE_NT_HEADERS32)RtlImageNtHeader(Image);
+	while (phdr != NULL) {
+
+		p_resource_sign = SfuQueryResourceData(3, Image, &SignSize);
+		if (p_resource_sign == NULL)
+			break;
+
+		if (SignSize != 128)
+			break;
+
+		if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &lh_hash))
+			break;
+
+		CRC = phdr->OptionalHeader.CheckSum;
+
+		memcpy(e_sign, p_resource_sign, sizeof(e_sign));
+		memset(p_resource_sign, 0, sizeof(e_sign));
+
+		phdr->OptionalHeader.CheckSum = 0;
+
+		MD5Update(ctx, Image, ImageSize);
+
+		phdr->OptionalHeader.CheckSum = CRC;
+
+		memcpy(p_resource_sign, e_sign, sizeof(e_sign));
+		MD5Final(ctx);
+		if (!CryptSetHashParam(lh_hash, HP_HASHVAL, (const BYTE *)&ctx->digest, 0)) {
+			CryptDestroyHash(lh_hash);
+			break;
+		}
+
+		CryptVerifySignatureW(lh_hash, (const BYTE *)&e_sign, sizeof(e_sign), hKey, 0, 0);
+		break;
+	}
 }

@@ -4,9 +4,9 @@
 *
 *  TITLE:       NTOS.H
 *
-*  VERSION:     1.27
+*  VERSION:     1.28
 *
-*  DATE:        12 Jan 2016
+*  DATE:        14 Jan 2016
 *
 *  Common header file for the ntos API functions and definitions.
 *
@@ -2757,7 +2757,7 @@ typedef struct _LDR_DATA_TABLE_ENTRY_COMPATIBLE {
 } LDR_DATA_TABLE_ENTRY_COMPATIBLE, *PLDR_DATA_TABLE_ENTRY_COMPATIBLE;
 typedef LDR_DATA_TABLE_ENTRY_COMPATIBLE LDR_DATA_TABLE_ENTRY;
 typedef LDR_DATA_TABLE_ENTRY_COMPATIBLE *PLDR_DATA_TABLE_ENTRY;
-typedef const struct _LDR_DATA_TABLE_ENTRY *PCLDR_DATA_TABLE_ENTRY;
+typedef LDR_DATA_TABLE_ENTRY *PCLDR_DATA_TABLE_ENTRY;
 
 /*
 * WDM END
@@ -3545,6 +3545,27 @@ ULONG NTAPI CsrGetProcessId(
 /*
 ** Runtime Library API START
 */
+
+PVOID NTAPI RtlAddVectoredExceptionHandler(
+	_In_ ULONG First,
+	_In_ PVECTORED_EXCEPTION_HANDLER Handler
+	);
+
+ULONG NTAPI RtlRemoveVectoredExceptionHandler(
+	_In_ PVOID Handle
+	);
+
+VOID NTAPI RtlPushFrame(
+	_In_ PTEB_ACTIVE_FRAME Frame
+	);
+
+VOID NTAPI RtlPopFrame(
+	_In_ PTEB_ACTIVE_FRAME Frame
+	);
+
+PTEB_ACTIVE_FRAME NTAPI RtlGetFrame(
+	VOID
+	);
 
 VOID NTAPI RtlInitUnicodeString(
 	_Inout_	PUNICODE_STRING DestinationString,
@@ -4343,6 +4364,16 @@ NTSTATUS NTAPI NtImpersonateThread(
 	_In_        PSECURITY_QUALITY_OF_SERVICE SecurityQos
 	);
 
+NTSTATUS NTAPI NtSetContextThread(
+	_In_        HANDLE ThreadHandle,
+	_In_        PCONTEXT ThreadContext
+	);
+
+NTSTATUS NTAPI NtGetContextThread(
+	_In_        HANDLE ThreadHandle,
+	_Inout_     PCONTEXT ThreadContext
+	);
+
 NTSTATUS NTAPI NtQueryInformationProcess(
 	_In_		HANDLE ProcessHandle,
 	_In_		PROCESSINFOCLASS ProcessInformationClass,
@@ -4408,11 +4439,19 @@ NTSTATUS NTAPI NtReadVirtualMemory(
 	);
 
 NTSTATUS NTAPI NtWriteVirtualMemory(
-	_In_ HANDLE ProcessHandle,
-	_In_opt_ PVOID BaseAddress,
-	_In_ VOID *Buffer,
-	_In_ SIZE_T BufferSize,
-	_Out_opt_ PSIZE_T NumberOfBytesWritten
+	_In_        HANDLE ProcessHandle,
+	_In_opt_    PVOID BaseAddress,
+	_In_        VOID *Buffer,
+	_In_        SIZE_T BufferSize,
+	_Out_opt_   PSIZE_T NumberOfBytesWritten
+	);
+
+NTSTATUS NTAPI NtProtectVirtualMemory(
+	_In_        HANDLE ProcessHandle,
+	_Inout_     PVOID *BaseAddress,
+	_Inout_     PSIZE_T RegionSize,
+	_In_        ULONG NewProtect,
+	_Out_       PULONG OldProtect
 	);
 
 NTSTATUS NTAPI NtEnumerateKey(

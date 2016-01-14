@@ -157,7 +157,7 @@ UINT SfProcessCmdLine(
 	NTSTATUS  status;
 	ULONG     rlen = 0, uType = 32;
 	WCHAR     textbuf[MAX_PATH + 1], textbuf2[MAX_PATH * 2];
-	WCHAR     mode[MAX_PATH + 1];
+	WCHAR     szMode[MAX_PATH + 1];
 
 	//path
 	RtlSecureZeroMemory(&textbuf, sizeof(textbuf));
@@ -172,13 +172,13 @@ UINT SfProcessCmdLine(
 	}
 
 	//type
-	RtlSecureZeroMemory(&mode, sizeof(mode));
-	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&mode, sizeof(mode), &rlen);
+	RtlSecureZeroMemory(&szMode, sizeof(szMode));
+	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, sizeof(szMode), &rlen);
 	if (rlen == 0) {
 		uType = 32;
 	}
 	else {
-		uType = strtoul(mode);
+		uType = strtoul(szMode);
 		if (uType != 32 && uType != 64) {
 
 			SfcuiPrintText(g_ConOut,

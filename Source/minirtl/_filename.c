@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include "minirtl.h"
 
 char *_filename_a(const char *f)
 {
@@ -66,4 +67,62 @@ wchar_t *_fileext_w(const wchar_t *f)
 		p = (wchar_t *)f;
 
 	return p;
+}
+
+char *_filename_noext_a(char *dest, const char *f)
+{
+	char *p, *l, *dot;
+
+	if ((f == 0) || (dest == 0))
+		return 0;
+
+	p = _filename_a(f);
+	dot = _strend_a(p);
+	l = p;
+
+	while (*l != (char)0)
+	{
+		if (*l == '.')
+			dot = l;
+		l++;
+	}
+
+	while (p<dot)
+	{
+		*dest = *p;
+		p++;
+		dest++;
+	}
+
+	*dest = 0;
+	return dest;
+}
+
+wchar_t *_filename_noext_w(wchar_t *dest, const wchar_t *f)
+{
+	wchar_t *p, *l, *dot;
+
+	if ((f == 0) || (dest == 0))
+		return 0;
+
+	p = _filename_w(f);
+	dot = _strend_w(p);
+	l = p;
+
+	while (*l != (wchar_t)0)
+	{
+		if (*l == (wchar_t)'.')
+			dot = l;
+		l++;
+	}
+
+	while (p<dot)
+	{
+		*dest = *p;
+		p++;
+		dest++;
+	}
+
+	*dest = 0;
+	return dest;
 }

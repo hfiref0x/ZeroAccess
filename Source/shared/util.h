@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        10 Jan 2016
+*  DATE:        14 Jan 2016
 *
 *  ZeroAccess support routines header file.
 *
@@ -30,9 +30,9 @@ typedef struct _ZA_BOT_PATH {
 } ZA_BOT_PATH, *PZA_BOT_PATH;
 
 VOID SfuDecodeStream(
-	_Inout_ PBYTE Stream,
-	_In_    SIZE_T StreamSize,
-	_In_    DWORD Key
+	_Inout_ unsigned char *stream,
+	_In_ size_t size,
+	_In_ unsigned long key
 	);
 
 BOOL SfuBuildBotPath(
@@ -79,4 +79,20 @@ BOOL SfuElevatePriv(
 
 VOID SftListThreadPriv(
 	VOID
+	);
+
+PBYTE SfuQueryResourceData(
+	_In_ ULONG_PTR ResourceId,
+	_In_ PVOID DllHandle,
+	_In_ PULONG DataSize
+	);
+
+NTSTATUS SfuLoadPeerList(
+	_In_ OBJECT_ATTRIBUTES *ObjectAttributes,
+	_In_ ZA_PEERINFO **PeerList,
+	_In_ PULONG NumberOfPeers
+	);
+
+BOOL SfuCreateDirectory(
+	_In_ OBJECT_ATTRIBUTES *ObjectAttributes
 	);
