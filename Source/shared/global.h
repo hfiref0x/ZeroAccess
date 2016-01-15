@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.0
 *
-*  DATE:        12 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  Common header file for the program support routines.
 *
@@ -55,8 +55,10 @@
 #include "za.h"
 #include "util.h"
 #include "md5.h"
+#include "ea.h"
 #include "za_rkey.h"
-//#include "ldr.h"
+#include "za_crypto.h"
+#include "ldr.h"
 //#include "p2p.h"
 //#include "inject.h"
 //#include "uac.h"

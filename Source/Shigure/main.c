@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        10 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  Shigure program entry point.
 *
@@ -74,7 +74,7 @@ UINT SfDecryptPayload(
 			break;
 
 		enc_data_size = 0;
-		enc_data = SfuQueryResourceData(2, pdll, &enc_data_size);
+		enc_data = SfLdrQueryResourceData(2, pdll, &enc_data_size);
 		if (enc_data == NULL)
 			break;
 

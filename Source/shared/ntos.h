@@ -4,9 +4,9 @@
 *
 *  TITLE:       NTOS.H
 *
-*  VERSION:     1.28
+*  VERSION:     1.29
 *
-*  DATE:        14 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  Common header file for the ntos API functions and definitions.
 *
@@ -1094,6 +1094,27 @@ typedef struct _FILE_REPARSE_POINT_INFORMATION {
 	LONGLONG FileReference;
 	ULONG Tag;
 } FILE_REPARSE_POINT_INFORMATION, *PFILE_REPARSE_POINT_INFORMATION;
+
+//
+// Define the flags for NtSet(Query)EaFile service structure entries
+//
+
+#define FILE_NEED_EA                    0x00000080
+
+//
+// Define EA type values
+//
+
+#define FILE_EA_TYPE_BINARY             0xfffe
+#define FILE_EA_TYPE_ASCII              0xfffd
+#define FILE_EA_TYPE_BITMAP             0xfffb
+#define FILE_EA_TYPE_METAFILE           0xfffa
+#define FILE_EA_TYPE_ICON               0xfff9
+#define FILE_EA_TYPE_EA                 0xffee
+#define FILE_EA_TYPE_MVMT               0xffdf
+#define FILE_EA_TYPE_MVST               0xffde
+#define FILE_EA_TYPE_ASN1               0xffdd
+#define FILE_EA_TYPE_FAMILY_IDS         0xff01
 
 typedef struct _FILE_FULL_EA_INFORMATION {
 	ULONG NextEntryOffset;
@@ -2723,6 +2744,12 @@ typedef struct _DRIVER_OBJECT {
 } DRIVER_OBJECT;
 typedef struct _DRIVER_OBJECT *PDRIVER_OBJECT;
 
+typedef struct _LDR_RESOURCE_INFO {
+	ULONG_PTR Type;
+	ULONG_PTR Name;
+	ULONG Lang;
+} LDR_RESOURCE_INFO, *PLDR_RESOURCE_INFO;
+
 typedef struct _LDR_DATA_TABLE_ENTRY_COMPATIBLE {
 	LIST_ENTRY InLoadOrderLinks;
 	LIST_ENTRY InMemoryOrderLinks;
@@ -3819,7 +3846,20 @@ NTSTATUS NTAPI RtlDecompressBuffer(
 	);
 
 PIMAGE_NT_HEADERS NTAPI RtlImageNtHeader(
-	IN PVOID Base
+	_In_ PVOID Base
+	);
+
+NTSYSAPI PVOID NTAPI RtlAddressInSectionTable(
+	_In_ PIMAGE_NT_HEADERS NtHeaders,
+	_In_ PVOID BaseOfImage,
+	_In_ ULONG VirtualAddress
+	);
+
+PVOID NTAPI RtlImageDirectoryEntryToData(
+	PVOID BaseOfImage,
+	BOOLEAN MappedAsImage,
+	USHORT DirectoryEntry,
+	PULONG Size
 	);
 
 VOID NTAPI RtlSecondsSince1970ToTime(
@@ -4178,6 +4218,52 @@ NTSTATUS NTAPI NtQueryInformationFile(
 	_In_	FILE_INFORMATION_CLASS FileInformationClass
 	);
 
+NTSTATUS NTAPI NtFsControlFile(
+	_In_     HANDLE FileHandle,
+	_In_opt_ HANDLE Event,
+	_In_opt_ PIO_APC_ROUTINE ApcRoutine,
+	_In_opt_ PVOID ApcContext,
+	_Out_    PIO_STATUS_BLOCK IoStatusBlock,
+	_In_     ULONG FsControlCode,
+	_In_     PVOID InputBuffer,
+	_In_     ULONG InputBufferLength,
+	_Out_    PVOID OutputBuffer,
+	_In_     ULONG OutputBufferLength
+	);
+
+NTSTATUS NTAPI NtQueryDirectoryFile(
+	_In_      HANDLE FileHandle,
+	_In_opt_  HANDLE Event,
+	_In_opt_  PIO_APC_ROUTINE ApcRoutine,
+	_In_opt_  PVOID ApcContext,
+	_Out_     PIO_STATUS_BLOCK IoStatusBlock,
+	_Out_     PVOID FileInformation,
+	_In_      ULONG Length,
+	_In_      FILE_INFORMATION_CLASS FileInformationClass,
+	_In_      BOOLEAN ReturnSingleEntry,
+	_In_opt_  PUNICODE_STRING FileName,
+	_In_      BOOLEAN RestartScan
+	);
+
+NTSTATUS NTAPI NtQueryEaFile(
+	_In_ HANDLE FileHandle,
+	_Out_ PIO_STATUS_BLOCK IoStatusBlock,
+	__out_bcount(Length) PVOID Buffer,
+	_In_ ULONG Length,
+	_In_ BOOLEAN ReturnSingleEntry,
+	__in_bcount_opt(EaListLength) PVOID EaList,
+	_In_ ULONG EaListLength,
+	_In_opt_ PULONG EaIndex,
+	_In_ BOOLEAN RestartScan
+	);
+
+NTSTATUS NTAPI NtSetEaFile(
+	_In_ HANDLE FileHandle,
+	_Out_ PIO_STATUS_BLOCK IoStatusBlock,
+	__in_bcount(Length) PVOID Buffer,
+	_In_ ULONG Length
+	);
+
 NTSTATUS NTAPI NtQueryVolumeInformationFile(
 	_In_    HANDLE FileHandle,
 	_Out_   PIO_STATUS_BLOCK IoStatusBlock,
@@ -4419,6 +4505,22 @@ NTSTATUS NTAPI NtCreateEvent(
 	_In_opt_	POBJECT_ATTRIBUTES ObjectAttributes,
 	_In_		EVENT_TYPE EventType,
 	_In_		BOOLEAN InitialState
+	);
+
+NTSTATUS NTAPI NtAllocateVirtualMemory(
+	_In_        HANDLE ProcessHandle,
+	_Inout_     PVOID *BaseAddress,
+	_In_        ULONG_PTR ZeroBits,
+	_Inout_     PSIZE_T RegionSize,
+	_In_        ULONG AllocationType,
+	_In_        ULONG Protect
+	);
+
+NTSTATUS NTAPI NtFreeVirtualMemory(
+	_In_       HANDLE ProcessHandle,
+	_Inout_    PVOID *BaseAddress,
+	_Inout_    PSIZE_T RegionSize,
+	_In_       ULONG FreeType
 	);
 
 NTSTATUS NTAPI NtQueryVirtualMemory(

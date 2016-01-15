@@ -203,8 +203,11 @@
     <ClCompile Include="..\minirtl\_strstri.c" />
     <ClCompile Include="..\shared\cab.c" />
     <ClCompile Include="..\shared\cui.c" />
+    <ClCompile Include="..\shared\ea.c" />
+    <ClCompile Include="..\shared\ldr.c" />
     <ClCompile Include="..\shared\md5.c" />
     <ClCompile Include="..\shared\util.c" />
+    <ClCompile Include="..\shared\za_crypto.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
@@ -214,11 +217,15 @@
     <ClInclude Include="..\minirtl\_filename.h" />
     <ClInclude Include="..\shared\cab.h" />
     <ClInclude Include="..\shared\cui.h" />
+    <ClInclude Include="..\shared\ea.h" />
     <ClInclude Include="..\shared\global.h" />
+    <ClInclude Include="..\shared\ldr.h" />
     <ClInclude Include="..\shared\md5.h" />
     <ClInclude Include="..\shared\ntos.h" />
     <ClInclude Include="..\shared\util.h" />
     <ClInclude Include="..\shared\za.h" />
+    <ClInclude Include="..\shared\za_crypto.h" />
+    <ClInclude Include="..\shared\za_rkey.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

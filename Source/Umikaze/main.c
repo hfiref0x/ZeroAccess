@@ -62,7 +62,7 @@ NTSTATUS SfDecodePeerList(
 
 		InitializeObjectAttributes(&obja, &NtFileName, OBJ_CASE_INSENSITIVE, 0, NULL);
 		status = NtCreateFile(&hFile, FILE_READ_ACCESS | SYNCHRONIZE, &obja, &iost, NULL, 0,
-			FILE_SHARE_READ, FILE_OPEN_IF,
+			FILE_SHARE_READ, FILE_OPEN,
 			FILE_SYNCHRONOUS_IO_NONALERT | FILE_NON_DIRECTORY_FILE, NULL, 0);
 		if (!NT_SUCCESS(status))
 			break;

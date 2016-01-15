@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{06E37BF4-003C-43F6-B0D5-6B9DAE05D4F7}</ProjectGuid>
+    <ProjectGuid>{169C0A78-64AD-4862-A6B6-17E7A3CA9AE3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Umikaze</RootNamespace>
+    <RootNamespace>Harusame</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -73,33 +73,29 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>.\output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>.\output\$(Platform)\$(Configuration)\</IntDir>
-    <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>.\output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>.\output\$(Platform)\$(Configuration)\</IntDir>
-    <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>.\output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>.\output\$(Platform)\$(Configuration)\</IntDir>
-    <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>.\output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>.\output\$(Platform)\$(Configuration)\</IntDir>
-    <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
@@ -108,13 +104,14 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>SfMain</EntryPointSymbol>
+      <AdditionalDependencies>cryptdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
@@ -123,6 +120,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>SfMain</EntryPointSymbol>
+      <AdditionalDependencies>cryptdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -142,9 +140,10 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>SfMain</EntryPointSymbol>
       <SetChecksum>true</SetChecksum>
+      <AdditionalDependencies>cryptdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -164,9 +163,10 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>SfMain</EntryPointSymbol>
       <SetChecksum>true</SetChecksum>
+      <AdditionalDependencies>cryptdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -205,9 +205,6 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\minirtl\cmdline.h" />
-    <ClInclude Include="..\..\minirtl\minirtl.h" />
-    <ClInclude Include="..\..\minirtl\rtltypes.h" />
     <ClInclude Include="..\minirtl\cmdline.h" />
     <ClInclude Include="..\minirtl\minirtl.h" />
     <ClInclude Include="..\minirtl\rtltypes.h" />

@@ -17,7 +17,7 @@ wchar_t *_filename_noext_w(wchar_t *dest, const wchar_t *f);
 #else // ANSI
 #define _filename         _filename_a
 #define _fileext          _fileext_a
-#define _filename_noextA  _filename_noextA
+#define _filename_noext  _filename_noext_a
 #endif
 
 #endif /* _FILENAMEH_ */

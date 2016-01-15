@@ -111,6 +111,15 @@
     <ClCompile Include="..\minirtl\ultohex.c">
       <Filter>minirtl</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\ldr.c">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\za_crypto.c">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\ea.c">
+      <Filter>shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\minirtl\_filename.h">
@@ -147,6 +156,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\cab.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\ldr.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\za_crypto.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\za_rkey.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\ea.h">
       <Filter>shared</Filter>
     </ClInclude>
   </ItemGroup>

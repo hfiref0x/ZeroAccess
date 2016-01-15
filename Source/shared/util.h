@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        14 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  ZeroAccess support routines header file.
 *
@@ -79,12 +79,6 @@ BOOL SfuElevatePriv(
 
 VOID SftListThreadPriv(
 	VOID
-	);
-
-PBYTE SfuQueryResourceData(
-	_In_ ULONG_PTR ResourceId,
-	_In_ PVOID DllHandle,
-	_In_ PULONG DataSize
 	);
 
 NTSTATUS SfuLoadPeerList(

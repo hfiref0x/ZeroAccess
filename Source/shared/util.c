@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        14 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  ZeroAccess support routines.
 *
@@ -799,6 +799,7 @@ BOOL SfuElevatePriv(
 		if (ProcessList == NULL)
 			break;
 
+		RtlSecureZeroMemory(&uLookupProcess, sizeof(uLookupProcess));
 		RtlInitUnicodeString(&uLookupProcess, L"lsass.exe");
 		pList = ProcessList;
 
@@ -828,50 +829,11 @@ BOOL SfuElevatePriv(
 }
 
 /*
-* SfuQueryResourceData
-*
-* Purpose:
-*
-* Load resource by given id (win32 FindResource, SizeofResource, LockResource).
-*
-*/
-PBYTE SfuQueryResourceData(
-	_In_ ULONG_PTR ResourceId,
-	_In_ PVOID DllHandle,
-	_In_ PULONG DataSize
-	)
-{
-	NTSTATUS                   status;
-	ULONG_PTR                  IdPath[3];
-	IMAGE_RESOURCE_DATA_ENTRY  *DataEntry;
-	PBYTE                      Data = NULL;
-	ULONG                      SizeOfData = 0;
-
-	if (DllHandle != NULL) {
-
-		IdPath[0] = (ULONG_PTR)RT_RCDATA; //type
-		IdPath[1] = ResourceId;           //id
-		IdPath[2] = 0;                    //lang
-
-		status = LdrFindResource_U(DllHandle, (ULONG_PTR*)&IdPath, 3, &DataEntry);
-		if (NT_SUCCESS(status)) {
-			status = LdrAccessResource(DllHandle, DataEntry, &Data, &SizeOfData);
-			if (NT_SUCCESS(status)) {
-				if (DataSize) {
-					*DataSize = SizeOfData;
-				}
-			}
-		}
-	}
-	return Data;
-}
-
-/*
 * SfuLoadPeerList
 *
 * Purpose:
 *
-* Load peer list from filename given in win32 format.
+* Load peer list from file.
 *
 */
 NTSTATUS SfuLoadPeerList(
@@ -977,6 +939,7 @@ BOOL SfuIsDirectoryExists(
 	IO_STATUS_BLOCK  IoStatusBlock;
 	OBJECT_ATTRIBUTES ObjectAttributes;
 
+	RtlSecureZeroMemory(&usDirectoryName, sizeof(usDirectoryName));
 	RtlInitUnicodeString(&usDirectoryName, DirectoryName);
 	InitializeObjectAttributes(&ObjectAttributes, &usDirectoryName, OBJ_CASE_INSENSITIVE, 0, NULL);
 
@@ -997,56 +960,4 @@ BOOL SfuIsDirectoryExists(
 		return TRUE;
 	}
 	return FALSE;
-}
-
-//move to zacrypto.c
-//@@implemented in harusame
-VOID SfcZAVerifyFile(
-	HCRYPTPROV  hProv,
-	HCRYPTKEY hKey,
-	MD5_CTX *ctx,		
-	PBYTE Image,		
-	DWORD ImageSize		
-	)
-{
-	HCRYPTHASH          lh_hash = 0; 
-	ULONG               CRC, SignSize = 0; 
-	BYTE                e_sign[128];
-	PBYTE               p_resource_sign; 
-	PIMAGE_NT_HEADERS32 phdr; 
-
-	phdr = (PIMAGE_NT_HEADERS32)RtlImageNtHeader(Image);
-	while (phdr != NULL) {
-
-		p_resource_sign = SfuQueryResourceData(3, Image, &SignSize);
-		if (p_resource_sign == NULL)
-			break;
-
-		if (SignSize != 128)
-			break;
-
-		if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &lh_hash))
-			break;
-
-		CRC = phdr->OptionalHeader.CheckSum;
-
-		memcpy(e_sign, p_resource_sign, sizeof(e_sign));
-		memset(p_resource_sign, 0, sizeof(e_sign));
-
-		phdr->OptionalHeader.CheckSum = 0;
-
-		MD5Update(ctx, Image, ImageSize);
-
-		phdr->OptionalHeader.CheckSum = CRC;
-
-		memcpy(p_resource_sign, e_sign, sizeof(e_sign));
-		MD5Final(ctx);
-		if (!CryptSetHashParam(lh_hash, HP_HASHVAL, (const BYTE *)&ctx->digest, 0)) {
-			CryptDestroyHash(lh_hash);
-			break;
-		}
-
-		CryptVerifySignatureW(lh_hash, (const BYTE *)&e_sign, sizeof(e_sign), hKey, 0, 0);
-		break;
-	}
 }

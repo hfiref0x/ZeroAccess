@@ -14,15 +14,18 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="minirtl">
-      <UniqueIdentifier>{5e475bb5-a4f5-471e-b3c8-d87ad53517d2}</UniqueIdentifier>
+      <UniqueIdentifier>{ee77c473-79e0-4e59-9cc2-8a1c0f3caaa6}</UniqueIdentifier>
     </Filter>
     <Filter Include="shared">
-      <UniqueIdentifier>{4b54bbae-5cb8-4e4d-8558-c08ddc6ea92b}</UniqueIdentifier>
+      <UniqueIdentifier>{9ddd8dd9-4aea-4a5a-8649-efbcc9649130}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\minirtl\_filename.c">
+      <Filter>minirtl</Filter>
     </ClCompile>
     <ClCompile Include="..\minirtl\_strcat.c">
       <Filter>minirtl</Filter>
@@ -51,34 +54,13 @@
     <ClCompile Include="..\minirtl\_strncpy.c">
       <Filter>minirtl</Filter>
     </ClCompile>
-    <ClCompile Include="..\minirtl\cmdline.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minirtl\strtou64.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minirtl\ultostr.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\util.c">
-      <Filter>shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\md5.c">
-      <Filter>shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\cui.c">
-      <Filter>shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minirtl\strtoul.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\minirtl\_filename.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
     <ClCompile Include="..\minirtl\_strstr.c">
       <Filter>minirtl</Filter>
     </ClCompile>
     <ClCompile Include="..\minirtl\_strstri.c">
+      <Filter>minirtl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\minirtl\cmdline.c">
       <Filter>minirtl</Filter>
     </ClCompile>
     <ClCompile Include="..\minirtl\hextou64.c">
@@ -99,6 +81,12 @@
     <ClCompile Include="..\minirtl\strtoi64.c">
       <Filter>minirtl</Filter>
     </ClCompile>
+    <ClCompile Include="..\minirtl\strtou64.c">
+      <Filter>minirtl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\minirtl\strtoul.c">
+      <Filter>minirtl</Filter>
+    </ClCompile>
     <ClCompile Include="..\minirtl\u64tohex.c">
       <Filter>minirtl</Filter>
     </ClCompile>
@@ -108,13 +96,25 @@
     <ClCompile Include="..\minirtl\ultohex.c">
       <Filter>minirtl</Filter>
     </ClCompile>
+    <ClCompile Include="..\minirtl\ultostr.c">
+      <Filter>minirtl</Filter>
+    </ClCompile>
     <ClCompile Include="..\shared\cab.c">
       <Filter>shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\ldr.c">
+    <ClCompile Include="..\shared\cui.c">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\md5.c">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\util.c">
       <Filter>shared</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\za_crypto.c">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\ldr.c">
       <Filter>shared</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\ea.c">
@@ -122,36 +122,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\minirtl\cmdline.h">
-      <Filter>minirtl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\minirtl\rtltypes.h">
-      <Filter>minirtl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\minirtl\minirtl.h">
-      <Filter>minirtl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\za.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\md5.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\ntos.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\util.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\cui.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\global.h">
-      <Filter>shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\minirtl\_filename.h">
       <Filter>minirtl</Filter>
     </ClInclude>
@@ -167,13 +137,34 @@
     <ClInclude Include="..\shared\cab.h">
       <Filter>shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\ldr.h">
+    <ClInclude Include="..\shared\cui.h">
       <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\global.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\md5.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\ntos.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\util.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\za.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\za_rkey.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\za_crypto.h">
       <Filter>shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\za_rkey.h">
+    <ClInclude Include="..\shared\ldr.h">
       <Filter>shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\ea.h">
