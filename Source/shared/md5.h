@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        10 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  ZeroAccess MD5 support header file.
 *

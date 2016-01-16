@@ -18,6 +18,7 @@
 *******************************************************************************/
 
 #include "global.h"
+#include "ea.h"
 
 //NextOffset 0, EaNameLength 3, EaName VER
 BYTE g_ZaFileEa[] = { 0x00, 0x00, 0x00, 0x00, 0x03, 0x56, 0x45, 0x52, 0x00 };

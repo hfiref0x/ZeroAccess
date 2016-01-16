@@ -19,6 +19,7 @@
 
 #include "..\shared\global.h"
 #include "..\shared\cui.h"
+#include "..\shared\za_rkey.h"
 
 HANDLE g_ConOut = NULL;
 WCHAR BE = 0xFEFF;

@@ -31,7 +31,7 @@ Usage:
 Verifies if given file is valid container for ZeroAccess. Requires EA to be set at input file. More information about verification algorithm can be found in source.
 
 Usage: 
-+ harusame inputfile [mode, default 32], e.g. harusame 80000000.@ 32
++ harusame inputfile [mode 32 or 64, default 32], e.g. harusame 80000000.@ 32
 
 ...
 

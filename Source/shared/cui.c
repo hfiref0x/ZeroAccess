@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        10 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  Console output.
 *
@@ -19,6 +19,14 @@
 
 #include "global.h"
 
+/*
+* SfcuiPrintText
+*
+* Purpose:
+*
+* Output text to the console or file.
+*
+*/
 VOID SfcuiPrintText(
 	HANDLE hOutConsole,
 	LPWSTR lpText,

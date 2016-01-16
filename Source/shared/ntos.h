@@ -4,9 +4,9 @@
 *
 *  TITLE:       NTOS.H
 *
-*  VERSION:     1.29
+*  VERSION:     1.30
 *
-*  DATE:        15 Jan 2016
+*  DATE:        16 Jan 2016
 *
 *  Common header file for the ntos API functions and definitions.
 *
@@ -3572,6 +3572,9 @@ ULONG NTAPI CsrGetProcessId(
 /*
 ** Runtime Library API START
 */
+ULONG NTAPI RtlRandomEx(
+	_Inout_ PULONG Seed
+	);
 
 PVOID NTAPI RtlAddVectoredExceptionHandler(
 	_In_ ULONG First,
@@ -3923,6 +3926,211 @@ ULONG DbgPrint(
 /*
 ** Runtime Library API END
 */
+
+/*
+** Generic AVL API START
+*/
+typedef ULONG CLONG;
+
+typedef enum _TABLE_SEARCH_RESULT {
+	TableEmptyTree,
+	TableFoundNode,
+	TableInsertAsLeft,
+	TableInsertAsRight
+} TABLE_SEARCH_RESULT;
+
+typedef enum _RTL_GENERIC_COMPARE_RESULTS {
+	GenericLessThan,
+	GenericGreaterThan,
+	GenericEqual
+} RTL_GENERIC_COMPARE_RESULTS;
+
+typedef struct _RTL_AVL_TABLE RTL_AVL_TABLE;
+typedef struct PRTL_AVL_TABLE *_RTL_AVL_TABLE;
+
+typedef RTL_GENERIC_COMPARE_RESULTS(NTAPI *PRTL_AVL_COMPARE_ROUTINE)(
+	_In_  _RTL_AVL_TABLE *Table,
+	_In_ PVOID FirstStruct,
+	_In_ PVOID SecondStruct
+	);
+
+typedef PVOID(NTAPI *PRTL_AVL_ALLOCATE_ROUTINE)(
+	_In_ _RTL_AVL_TABLE *Table,
+	_In_ ULONG ByteSize
+	);
+
+typedef VOID(NTAPI *PRTL_AVL_FREE_ROUTINE)(
+	_In_  _RTL_AVL_TABLE *Table,
+	_In_ _Post_invalid_ PVOID Buffer
+	);
+
+typedef NTSTATUS(NTAPI *PRTL_AVL_MATCH_FUNCTION)(
+	_In_  _RTL_AVL_TABLE *Table,
+	_In_ PVOID UserData,
+	_In_ PVOID MatchData
+	);
+
+typedef struct _RTL_BALANCED_LINKS {
+	struct _RTL_BALANCED_LINKS *Parent;
+	struct _RTL_BALANCED_LINKS *LeftChild;
+	struct _RTL_BALANCED_LINKS *RightChild;
+	CHAR Balance;
+	UCHAR Reserved[3];
+} RTL_BALANCED_LINKS, *PRTL_BALANCED_LINKS;
+
+typedef struct _RTL_AVL_TABLE {
+	RTL_BALANCED_LINKS BalancedRoot;
+	PVOID OrderedPointer;
+	ULONG WhichOrderedElement;
+	ULONG NumberGenericTableElements;
+	ULONG DepthOfTree;
+	PRTL_BALANCED_LINKS RestartKey;
+	ULONG DeleteCount;
+	PRTL_AVL_COMPARE_ROUTINE CompareRoutine;
+	PRTL_AVL_ALLOCATE_ROUTINE AllocateRoutine;
+	PRTL_AVL_FREE_ROUTINE FreeRoutine;
+	PVOID TableContext;
+} RTL_AVL_TABLE, *PRTL_AVL_TABLE;
+
+VOID NTAPI RtlInitializeGenericTableAvl(
+	_Out_ PRTL_AVL_TABLE Table,
+	_In_ PRTL_AVL_COMPARE_ROUTINE CompareRoutine,
+	_In_ PRTL_AVL_ALLOCATE_ROUTINE AllocateRoutine,
+	_In_ PRTL_AVL_FREE_ROUTINE FreeRoutine,
+	_In_opt_ PVOID TableContext
+	);
+
+PVOID NTAPI RtlInsertElementGenericTableAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_reads_bytes_(BufferSize) PVOID Buffer,
+	_In_ CLONG BufferSize,
+	_Out_opt_ PBOOLEAN NewElement
+	);
+
+PVOID NTAPI RtlInsertElementGenericTableFullAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_reads_bytes_(BufferSize) PVOID Buffer,
+	_In_ CLONG BufferSize,
+	_Out_opt_ PBOOLEAN NewElement,
+	_In_ PVOID NodeOrParent,
+	_In_ TABLE_SEARCH_RESULT SearchResult
+	);
+
+BOOLEAN NTAPI RtlDeleteElementGenericTableAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_ PVOID Buffer
+	);
+
+PVOID NTAPI RtlLookupElementGenericTableAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_ PVOID Buffer
+	);
+
+PVOID NTAPI RtlLookupElementGenericTableFullAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_ PVOID Buffer,
+	_Out_ PVOID *NodeOrParent,
+	_Out_ TABLE_SEARCH_RESULT *SearchResult
+	);
+
+PVOID NTAPI RtlEnumerateGenericTableAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_ BOOLEAN Restart
+	);
+
+PVOID NTAPI RtlEnumerateGenericTableWithoutSplayingAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_Inout_ PVOID *RestartKey
+	);
+
+PVOID NTAPI RtlLookupFirstMatchingElementGenericTableAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_ PVOID Buffer,
+	_Out_ PVOID *RestartKey
+	);
+
+PVOID NTAPI RtlEnumerateGenericTableLikeADirectory(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_opt_ PRTL_AVL_MATCH_FUNCTION MatchFunction,
+	_In_opt_ PVOID MatchData,
+	_In_ ULONG NextFlag,
+	_Inout_ PVOID *RestartKey,
+	_Inout_ PULONG DeleteCount,
+	_In_ PVOID Buffer
+	);
+
+PVOID NTAPI RtlGetElementGenericTableAvl(
+	_In_ PRTL_AVL_TABLE Table,
+	_In_ ULONG I
+	);
+
+ULONG NTAPI RtlNumberGenericTableElementsAvl(
+	_In_ PRTL_AVL_TABLE Table
+	);
+
+BOOLEAN NTAPI RtlIsGenericTableEmptyAvl(
+	_In_ PRTL_AVL_TABLE Table
+	);
+
+/*
+** Generic Avl END
+*/
+
+/*
+** Critical Section START
+*/
+#define LOGICAL ULONG
+
+NTSTATUS NTAPI RtlEnterCriticalSection(
+	PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+NTSTATUS NTAPI RtlLeaveCriticalSection(
+	PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+LOGICAL NTAPI RtlIsCriticalSectionLocked(
+	IN PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+LOGICAL NTAPI RtlIsCriticalSectionLockedByThread(
+	IN PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+ULONG NTAPI RtlGetCriticalSectionRecursionCount(
+	IN PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+LOGICAL NTAPI RtlTryEnterCriticalSection(
+	PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+NTSTATUS NTAPI RtlInitializeCriticalSection(
+	PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+VOID NTAPI RtlEnableEarlyCriticalSectionEventCreation(
+	VOID
+	);
+
+NTSTATUS NTAPI RtlInitializeCriticalSectionAndSpinCount(
+	PRTL_CRITICAL_SECTION CriticalSection,
+	ULONG SpinCount
+	);
+
+ULONG NTAPI RtlSetCriticalSectionSpinCount(
+	PRTL_CRITICAL_SECTION CriticalSection,
+	ULONG SpinCount
+	);
+
+NTSTATUS NTAPI RtlDeleteCriticalSection(
+	PRTL_CRITICAL_SECTION CriticalSection
+	);
+
+/*
+** Critical Section END
+*/
+
 
 /*
 ** Loader API START

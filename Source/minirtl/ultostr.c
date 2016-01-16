@@ -39,7 +39,7 @@ size_t ultostr_w(unsigned long x, wchar_t *s)
 		s[i-1] = (wchar_t)(x % 10) + L'0';
 		x /= 10;
 	}
-
+	
 	s[r] = (wchar_t)0;
 	return r;
 }

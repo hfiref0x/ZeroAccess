@@ -99,9 +99,6 @@
     <ClCompile Include="..\minirtl\ultostr.c">
       <Filter>minirtl</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\cab.c">
-      <Filter>shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared\cui.c">
       <Filter>shared</Filter>
     </ClCompile>
@@ -133,9 +130,6 @@
     </ClInclude>
     <ClInclude Include="..\minirtl\rtltypes.h">
       <Filter>minirtl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\cab.h">
-      <Filter>shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\cui.h">
       <Filter>shared</Filter>

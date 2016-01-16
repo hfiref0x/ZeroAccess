@@ -63,9 +63,6 @@
     <ClCompile Include="..\shared\util.c">
       <Filter>shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\md5.c">
-      <Filter>shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared\cui.c">
       <Filter>shared</Filter>
     </ClCompile>
@@ -108,16 +105,7 @@
     <ClCompile Include="..\minirtl\ultohex.c">
       <Filter>minirtl</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\cab.c">
-      <Filter>shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\ldr.c">
-      <Filter>shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\za_crypto.c">
-      <Filter>shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\ea.c">
+    <ClCompile Include="..\shared\md5.c">
       <Filter>shared</Filter>
     </ClCompile>
   </ItemGroup>
@@ -132,9 +120,6 @@
       <Filter>minirtl</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\za.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\md5.h">
       <Filter>shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\ntos.h">
@@ -164,19 +149,7 @@
     <ClInclude Include="..\minirtl\rtltypes.h">
       <Filter>minirtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\cab.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\ldr.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\za_crypto.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\za_rkey.h">
-      <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\ea.h">
+    <ClInclude Include="..\shared\md5.h">
       <Filter>shared</Filter>
     </ClInclude>
   </ItemGroup>

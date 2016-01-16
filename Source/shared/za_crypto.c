@@ -2,7 +2,7 @@
 *
 *  (C) COPYRIGHT AUTHORS, 2016
 *
-*  TITLE:       ZA_CRYPTO.Ñ
+*  TITLE:       ZA_CRYPTO.C
 *
 *  VERSION:     1.00
 *
@@ -18,6 +18,7 @@
 *******************************************************************************/
 
 #include "global.h"
+#include "ea.h"
 
 /*
 * SfcVerifyFile

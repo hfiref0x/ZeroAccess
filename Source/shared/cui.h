@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.0
 *
-*  DATE:        12 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  Common header file for console ui.
 *

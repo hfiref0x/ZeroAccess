@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.0
 *
-*  DATE:        11 Jan 2016
+*  DATE:        15 Jan 2016
 *
 *  ZeroAccess cabinet extraction from memory buffer.
 *
@@ -23,6 +23,14 @@
 #pragma comment(lib, "cabinet.lib")
 static CABDATA g_CabParam;
 
+/*
+* fdiAlloc
+*
+* Purpose:
+*
+* Callback function to allocate memory.
+*
+*/
 void* DIAMONDAPI fdiAlloc(
 	ULONG cb
 	)
@@ -30,6 +38,14 @@ void* DIAMONDAPI fdiAlloc(
 	return LocalAlloc(LPTR, cb);
 }
 
+/*
+* fdiFree
+*
+* Purpose:
+*
+* Callback function to free previously allocated memory.
+*
+*/
 void DIAMONDAPI fdiFree(
 	void HUGE *pv
 	)
@@ -39,6 +55,14 @@ void DIAMONDAPI fdiFree(
 	}
 }
 
+/*
+* fdiClose
+*
+* Purpose:
+*
+* Callback function to release memory allocated for file memory stream.
+*
+*/
 int DIAMONDAPI fdiClose(
 	CABDATA *hf
 	)
@@ -47,6 +71,14 @@ int DIAMONDAPI fdiClose(
 	return 0;
 }
 
+/*
+* fdiOpen
+*
+* Purpose:
+*
+* Callback function to create a memory stream.
+*
+*/
 INT_PTR DIAMONDAPI fdiOpen(
 	LPSTR pszFile,
 	int   oflag,
@@ -77,6 +109,14 @@ INT_PTR DIAMONDAPI fdiOpen(
 	return (INT_PTR)Data;
 }
 
+/*
+* fdiRead
+*
+* Purpose:
+*
+* Callback function to read from memory stream.
+*
+*/
 UINT DIAMONDAPI fdiRead(
 	CABDATA  *Data,
 	void FAR *pv,
@@ -93,6 +133,14 @@ UINT DIAMONDAPI fdiRead(
 	return bytesToRead;
 }
 
+/*
+* fdiWrite
+*
+* Purpose:
+*
+* Callback function to write to the memory stream.
+*
+*/
 UINT fdiWrite(
 	CABDATA  *Data,
 	void FAR *pv,
@@ -109,6 +157,14 @@ UINT fdiWrite(
 	return cb;
 }
 
+/*
+* fdiSeek
+*
+* Purpose:
+*
+* Callback function to seek in memory stream.
+*
+*/
 long fdiSeek(
 	CABDATA *Data,
 	long    dist,
@@ -134,6 +190,14 @@ long fdiSeek(
 	return pos;
 }
 
+/*
+* fdiNotify
+*
+* Purpose:
+*
+*  Callback notification function to update the application on the status of the decoder.
+*
+*/
 INT_PTR DIAMONDAPI fdiNotify(FDINOTIFICATIONTYPE fdint, PFDINOTIFICATION pfdin)
 {
 	INT_PTR Result = 0;
@@ -182,6 +246,16 @@ INT_PTR DIAMONDAPI fdiNotify(FDINOTIFICATIONTYPE fdint, PFDINOTIFICATION pfdin)
 	return Result;
 }
 
+/*
+* SfcabExtractMemory
+*
+* Purpose:
+*
+* Process cabinet file in memory and extract it contents.
+*
+* On success returned buffer must be deallocated with LocalFree after usage.
+*
+*/
 PVOID SfcabExtractMemory(
 	PVOID CabPtr,
 	ULONG CabSize,
