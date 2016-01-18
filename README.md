@@ -8,7 +8,7 @@ mode toolkit. Uses self made p2p engine for communication (main purpose - downlo
 
 various so-called security companies/corporations). Has multiple generations of various toolkit modules.
 
-This project provide you insights into ZeroAccess v3 code and provide several instruments to work with ZeroAccess v3 files.
+This project provide you insights into ZeroAccess v3 code and provide several instruments to work with ZeroAccess v3 files. Mostly provided for education purposes.
 
 # Project contents
 
@@ -17,23 +17,29 @@ This project provide you insights into ZeroAccess v3 code and provide several in
 Processes input file as ZeroAccess peer file, type required for correct port assignation. 
 Result is output file with Time and IP+Port pairs as text. Usage:
 
-+ umikaze peerlist_filename [type 32 or 64, default 32], e.g. umikaze s32 32
++ zadecode peerlist_filename [type 32 or 64, default 32], e.g. zadecode s32 32
 
 **Shigure - payload decryptor**
 
 Processes input as ZeroAccess payload container, attempting to decode it using RC4 and extract Microsoft Cabinet afterthat.
 
 Usage: 
-+ shigure inputfile [outputfile], e.g. shigure 80000000.@ out.bin
++ zadecrypt inputfile [outputfile], e.g. zadecrypt 80000000.@ out.bin
 
 **Harusame - payload container verificator**
 
 Verifies if given file is valid container for ZeroAccess. Requires EA to be set at input file. More information about verification algorithm can be found in source.
 
 Usage: 
-+ harusame inputfile [mode 32 or 64, default 32], e.g. harusame 80000000.@ 32
++ zacheck inputfile [mode 32 or 64, default 32], e.g. zacheck 80000000.@ 32
 
-...
+**Yuudachi - ZeroAccess p2p network crawler**
+
+GUI application that monitors given p2p botnet network and downloads payload from it. Downloaded files contain  all required information for further verification by zacheck tool. Dumps collected peers in ZeroAccess format so they can be used as bootstrap next. Use x86-32 version for win32 botnet and x64 for win64. For work required proper bootstrap list and read/write access to current directory.
+
+# System Requirements
+
+Does not require administrative privileges. Some tools may require read/write access for the their directories. Modern compatible NT version required, Windows XP not supported. For best appearance allow zamon32/zamon64 in firewall.
 
 # Build 
 

@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        15 Jan 2016
+*  DATE:        17 Jan 2016
 *
 *  ZeroAccess routines used for cryptography purposes.
 *
@@ -210,4 +210,46 @@ NTSTATUS SfcIsFileLegit(
 		RtlFreeUnicodeString(&usFileName);
 	}
 	return status;
+}
+
+/*
+* SfcValidateFileHeader
+*
+* Purpose:
+*
+* Verify fileheader from retL packet.
+*
+*/
+BOOL SfcValidateFileHeader(
+	HCRYPTPROV hCryptoProv,
+	HCRYPTKEY hCryptKey,
+	ZA_FILEHEADER *FileHeader
+	)
+{
+	BOOL bResult, cond = FALSE;
+	HCRYPTHASH   hCryptHash = 0;
+	MD5_CTX      ctx;
+
+	bResult = FALSE;
+
+	do {
+
+		if (!CryptCreateHash(hCryptoProv, CALG_MD5, 0, 0, &hCryptHash))
+			break;
+
+		MD5Init(&ctx);
+		MD5Update(&ctx, (UCHAR*)FileHeader, (UINT)3 * sizeof(ULONG));
+		MD5Final(&ctx);
+
+		if (!CryptSetHashParam(hCryptHash, HP_HASHVAL, (const BYTE *)&ctx.digest, 0))
+			break;
+		
+		bResult = CryptVerifySignatureW(hCryptHash, (const BYTE *)&FileHeader->Signature, sizeof(FileHeader->Signature), hCryptKey, 0, 0);
+
+	} while (cond);
+
+	if (hCryptHash != 0) {
+		CryptDestroyHash(hCryptHash);
+	}
+	return bResult;
 }

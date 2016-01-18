@@ -25,13 +25,21 @@ WCHAR BE = 0xFEFF;
 BOOL g_ConsoleOutput = FALSE;
 
 #define T_SFDECODETITLE L"Sirefef/ZeroAccess 3 peer list decoder v1.0 (10/01/16)"
-#define T_SFDECODEUSAGE L"Usage: sfdecode peerlist_filename [type 32 or 64, default 32]\n\r\te.g. sfdecode s32 32\r\n"
+#define T_SFDECODEUSAGE L"Usage: zadecode peerlist_filename [type 32 or 64, default 32]\n\r\te.g. zadecode s32 32\r\n"
 #define T_SFDECODEMODE  L"Wrong mode, possible values 32 or 64\r\n"
 #define T_SFUNSUCCESSF  L"Error generating list"
 #define T_SFBADDATA     L"File has wrong structure or damaged"
 #define T_SFGENERATED   L"File generated "
 #define T_SFPRESSANYKEY L"\r\nPress Enter to exit"
 
+/*
+* SfDecodePeerList
+*
+* Purpose:
+*
+* Decode peer list to file, ZA v3 variant.
+*
+*/
 NTSTATUS SfDecodePeerList(
 	LPWSTR lpInFileName,
 	LPWSTR lpOutFileName,
@@ -150,6 +158,14 @@ NTSTATUS SfDecodePeerList(
 	return status;
 }
 
+/*
+* SfProcessCmdLine
+*
+* Purpose:
+*
+* Parse command line and do the job.
+*
+*/
 UINT SfProcessCmdLine(
 	LPWSTR lpCommandLine
 	)
@@ -235,6 +251,14 @@ UINT SfProcessCmdLine(
 	return 0;
 }
 
+/*
+* SfMain
+*
+* Purpose:
+*
+* Umikaze main.
+*
+*/
 void SfMain(
 	VOID
 	)

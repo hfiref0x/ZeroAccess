@@ -292,6 +292,7 @@ VOID SfLdrLoadPayload(
 		if (ExceptionHandler) {
 
 #ifdef _DEBUG
+			RtlSecureZeroMemory(&DllName, sizeof(DllName));
 			RtlInitUnicodeString(&DllName, L"ntdll.dll");
 			if (NT_SUCCESS(LdrGetDllHandle(NULL, NULL, &DllName, &DllImageBase))) {
 				RtlInitString(&str, "NtMapViewOfSection");

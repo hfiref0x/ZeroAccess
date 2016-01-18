@@ -4,9 +4,9 @@
 *
 *  TITLE:       NTOS.H
 *
-*  VERSION:     1.30
+*  VERSION:     1.31
 *
-*  DATE:        16 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  Common header file for the ntos API functions and definitions.
 *
@@ -106,6 +106,13 @@
 #define NtCurrentProcess() ( (HANDLE)(LONG_PTR) -1 )
 #define ZwCurrentProcess() NtCurrentProcess()
 #define ZwCurrentThread()	 NtCurrentThread()
+
+//
+// Define special ByteOffset parameters for read and write operations
+//
+
+#define FILE_WRITE_TO_END_OF_FILE       0xffffffff
+#define FILE_USE_FILE_POINTER_POSITION  0xfffffffe
 
 //
 // This is the maximum MaximumLength for a UNICODE_STRING.
@@ -3505,9 +3512,9 @@ VOID(NTAPI *PLDR_LOADED_MODULE_ENUMERATION_CALLBACK_FUNCTION)(
 	);
 
 NTSTATUS NTAPI LdrEnumerateLoadedModules(
-	_In_ ULONG Flags,
-	_In_ PLDR_LOADED_MODULE_ENUMERATION_CALLBACK_FUNCTION CallbackFunction,
-	_In_ PVOID Context
+	_In_opt_ ULONG Flags,
+	_In_     PLDR_LOADED_MODULE_ENUMERATION_CALLBACK_FUNCTION CallbackFunction,
+	_In_opt_ PVOID Context
 	);
 
 NTSTATUS NTAPI LdrGetProcedureAddress(

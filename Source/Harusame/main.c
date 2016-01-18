@@ -26,13 +26,21 @@ WCHAR BE = 0xFEFF;
 BOOL g_ConsoleOutput = FALSE;
 
 #define T_SFCHECKTTITLE  L"Sirefef/ZeroAccess 3 file checker v1.0 (14/01/16)"
-#define T_SFCHECKUSAGE   L"Usage: sfcheck inputfile [mode 32 or 64, default 32]\n\r\te.g. sfcheck in.dll 32\r\n"
+#define T_SFCHECKUSAGE   L"Usage: zacheck inputfile [mode 32 or 64, default 32]\n\r\te.g. zacheck in.dll 32\r\n"
 #define T_SFCHECKMODE    L"Wrong mode, possible values 32 or 64\r\n"
 #define T_SFCHECKED      L"File verification SUCCESSFUL "
 #define T_SFCHECKFAIL    L"File verification FAILED "
 #define T_SFEAFAILURE    L"File extended attributes missing or incorrect, cannot verify file"
 #define T_SFPRESSANYKEY  L"\r\nPress Enter to exit"
 
+/*
+* SfProcessCmdLine
+*
+* Purpose:
+*
+* Parse command line and do the job.
+*
+*/
 UINT SfProcessCmdLine(
 	LPWSTR lpCommandLine
 	)
@@ -119,6 +127,14 @@ UINT SfProcessCmdLine(
 	return (NT_SUCCESS(status));
 }
 
+/*
+* SfMain
+*
+* Purpose:
+*
+* Harusame main.
+*
+*/
 void SfMain(
 	VOID
 	)

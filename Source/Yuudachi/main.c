@@ -2,13 +2,13 @@
 *
 *  (C) COPYRIGHT AUTHORS, 2016
 *
-*  TITLE:       ZA_CRYPTO.H
+*  TITLE:       MAIN.C
 *
 *  VERSION:     1.00
 *
 *  DATE:        17 Jan 2016
 *
-*  ZeroAccess cryptography.
+*  Yuudachi program entry point.
 *
 * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED
@@ -16,16 +16,32 @@
 * PARTICULAR PURPOSE.
 *
 *******************************************************************************/
-#pragma once
+#include "..\shared\global.h"
+#include "gui.h"
+#include "p2p.h"
 
-NTSTATUS SfcIsFileLegit(
-	_In_ LPWSTR lpFileName,
-	_In_ PBYTE BotKey,
-	_In_ DWORD BotKeySize
-	);
+/*
+* SfMain
+*
+* Purpose:
+*
+* Yuudachi main.
+*
+*/
+void SfMain(
+	VOID
+	)
+{
+	WSADATA  wsaData;
 
-BOOL SfcValidateFileHeader(
-	HCRYPTPROV hCryptoProv,
-	HCRYPTKEY hCryptKey,
-	ZA_FILEHEADER *FileHeader
-	);
+	__security_init_cookie();
+
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+		ExitProcess((UINT)-1);
+	}
+	
+	SfUImain();
+
+	WSACleanup();
+	ExitProcess(0);
+}

@@ -30,11 +30,21 @@ WCHAR BE = 0xFEFF;
 BOOL g_ConsoleOutput = FALSE;
 
 #define T_SFDECRYPTTITLE L"Sirefef/ZeroAccess 3 decryptor v1.0 (10/01/16)"
-#define T_SFDECRYPTUSAGE L"Usage: sfdecrypt inputfile [outputfile]\n\r\te.g. sfdecrypt in.dll out.bin\r\n"
+#define T_SFDECRYPTUSAGE L"Usage: zadecrypt inputfile [outputfile]\n\r\te.g. zadecrypt in.dll out.bin\r\n"
 #define T_SFDECRYPTED    L"File decrypted "
 #define T_SFDECRYPTFAIL  L"\r\nError while decrypting file"
 #define T_SFPRESSANYKEY  L"\r\nPress Enter to exit"
 
+/*
+* SfDecryptPayload
+*
+* Purpose:
+*
+* Decrypt container from resource using as hash md5 from file header bytes.
+*
+* CNG variant
+*
+*/
 UINT SfDecryptPayload(
 	LPWSTR lpParameter
 	)
@@ -209,6 +219,14 @@ UINT SfDecryptPayload(
 	return 0;
 }
 
+/*
+* SfMain
+*
+* Purpose:
+*
+* Shigure main.
+*
+*/
 void SfMain(
 	VOID
 	)

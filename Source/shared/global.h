@@ -57,3 +57,4 @@
 #include "md5.h"
 #include "za_crypto.h"
 #include "ldr.h"
+#include "rc4.h"

@@ -99,7 +99,7 @@ ULONG_PTR SfuWriteBufferToFile(
 		pPosition = NULL;
 
 		if (Append == TRUE) {
-			Position.LowPart = 0xFFFFFFFF;
+			Position.LowPart = FILE_WRITE_TO_END_OF_FILE;
 			Position.HighPart = -1;
 			pPosition = &Position;
 		}
@@ -848,6 +848,7 @@ NTSTATUS SfuLoadPeerList(
 	NTSTATUS                    status = STATUS_UNSUCCESSFUL;
 	IO_STATUS_BLOCK             iost;
 	FILE_STANDARD_INFORMATION   fsi;
+	SIZE_T                      memIO;
 
 	if ((NumberOfPeers == NULL) || (PeerList == NULL))
 		return status;
@@ -865,14 +866,15 @@ NTSTATUS SfuLoadPeerList(
 		if (!NT_SUCCESS(status))
 			break;
 
-		pData = RtlAllocateHeap(NtCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, (SIZE_T)fsi.EndOfFile.LowPart);
-		if (pData == NULL) {
-			status = STATUS_MEMORY_NOT_ALLOCATED;
+		if ((fsi.EndOfFile.LowPart % sizeof(ZA_PEERINFO)) != 0) {// incomplete/damaged file
+			status = STATUS_BAD_DATA;
 			break;
 		}
 
-		if ((fsi.EndOfFile.LowPart % sizeof(ZA_PEERINFO)) != 0) {// incomplete/damaged file
-			status = STATUS_BAD_DATA;
+		memIO = (SIZE_T)fsi.EndOfFile.LowPart;
+		NtAllocateVirtualMemory(NtCurrentProcess(), &pData, 0, &memIO, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		if (pData == NULL) {
+			status = STATUS_MEMORY_NOT_ALLOCATED;
 			break;
 		}
 
@@ -915,7 +917,7 @@ BOOL SfuCreateDirectory(
 		&IoStatusBlock,
 		NULL,
 		FILE_ATTRIBUTE_NORMAL,//za use hidden+system
-		0,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 		FILE_OPEN_IF,
 		FILE_DIRECTORY_FILE,
 		NULL,
@@ -926,38 +928,4 @@ BOOL SfuCreateDirectory(
 	}
 	NtClose(DirectoryHandle);
 	return TRUE;
-}
-
-//@@unimplemented
-BOOL SfuIsDirectoryExists(
-	_In_ PWSTR DirectoryName
-	)
-{
-	UNICODE_STRING   usDirectoryName;
-	NTSTATUS         status;
-	HANDLE           DirectoryHandle;
-	IO_STATUS_BLOCK  IoStatusBlock;
-	OBJECT_ATTRIBUTES ObjectAttributes;
-
-	RtlSecureZeroMemory(&usDirectoryName, sizeof(usDirectoryName));
-	RtlInitUnicodeString(&usDirectoryName, DirectoryName);
-	InitializeObjectAttributes(&ObjectAttributes, &usDirectoryName, OBJ_CASE_INSENSITIVE, 0, NULL);
-
-	status = NtCreateFile(&DirectoryHandle,
-		SYNCHRONIZE,
-		&ObjectAttributes,
-		&IoStatusBlock,
-		NULL,
-		FILE_ATTRIBUTE_READONLY,
-		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-		FILE_OPEN_IF,
-		FILE_DIRECTORY_FILE,
-		NULL,
-		0
-		);
-	if (NT_SUCCESS(status)) {
-		NtClose(DirectoryHandle);
-		return TRUE;
-	}
-	return FALSE;
 }

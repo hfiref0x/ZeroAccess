@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.00
 *
-*  DATE:        16 Jan 2016
+*  DATE:        17 Jan 2016
 *
 *  ZeroAccess common structures and definitions used within all projects.
 *
@@ -21,8 +21,13 @@
 
 typedef struct _ZA_PEERINFO {
 	ULONG   IP;
-	ULONG   Port : 14;
-	ULONG   TimeStamp : 18;
+	union {
+		ULONG PortAndTimeStamp;
+		struct {
+			ULONG   Port : 14;
+			ULONG   TimeStamp : 18;
+		} DUMMYSTRUCTNAME;
+	} DUMMYUNIONNAME;
 } ZA_PEERINFO, *PZA_PEERINFO;
 
 typedef struct _ZA_PACKETHEADER {
@@ -54,11 +59,3 @@ typedef struct _ZA_CALLHOME {
 	ULONG   AffId;
 	ULONG   CRC; //CRC32
 } ZA_CALLHOME, *PZA_CALLHOME;
-
-typedef struct _ZA_OP_CONTEXT {
-	PZA_PEERINFO List32;
-	ULONG nList32;
-	PZA_PEERINFO List64;
-	ULONG nList64;
-	HANDLE ProcessHeap;
-} ZA_OP_CONTEXT, *PZA_OP_CONTEXT;
