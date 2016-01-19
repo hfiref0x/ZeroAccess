@@ -4,9 +4,9 @@
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        10 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  Umikaze program entry point.
 *
@@ -171,11 +171,12 @@ UINT SfProcessCmdLine(
 	)
 {
 	NTSTATUS  status;
-	ULONG     rlen = 0, uType = 32;
+	ULONG     rlen, uType = 32;
 	WCHAR     textbuf[MAX_PATH + 1], textbuf2[MAX_PATH * 2];
 	WCHAR     szMode[MAX_PATH + 1];
 
 	//path
+	rlen = 0;
 	RtlSecureZeroMemory(&textbuf, sizeof(textbuf));
 	GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&textbuf, sizeof(textbuf), &rlen);
 	if (rlen == 0) {
@@ -188,6 +189,7 @@ UINT SfProcessCmdLine(
 	}
 
 	//type
+	rlen = 0;
 	RtlSecureZeroMemory(&szMode, sizeof(szMode));
 	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, sizeof(szMode), &rlen);
 	if (rlen == 0) {

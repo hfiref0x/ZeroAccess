@@ -21,10 +21,11 @@
 #include "..\shared\global.h"
 #include "..\shared\za_rkey.h"
 
-//some consts, we tested it looks ok (c)
+//some consts, we tested it and it looks ok (c)
+
 #define UDP_BUFFER_SIZE		        4096
-#define MAXIMUM_FILES		        32
-#define RECV_BUFFER_SIZE	        256*1024
+#define MAXIMUM_FILES               32
+#define RECV_BUFFER_SIZE            256*1024
 
 //client udp port
 

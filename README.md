@@ -31,6 +31,13 @@ Usage:
 
 GUI application that monitors given p2p botnet network and downloads payload from it. Downloaded files contain  all required information for further verification by zacheck tool. Dumps collected peers in ZeroAccess format so they can be used as bootstrap next. Use x86-32 version for win32 botnet and x64 for win64. For work required proper bootstrap list and read/write access to current directory.
 
+**Murasame - dropper extractor**
+
+Extracts actual bot installation dropper from encrypted resource of high level dropper.
+
+Usage:
++ zaextract inputfile [outputfile] hexkey, e.g. zaextract highlvlbot.bin lowlvlbot.bin 0x12345678
+
 # System Requirements
 
 Does not require administrative privileges. Some tools may require read/write access for the their directories. Modern compatible NT version required, Windows XP not supported. For best appearance allow zamon32/zamon64 in firewall.

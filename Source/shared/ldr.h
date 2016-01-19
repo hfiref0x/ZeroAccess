@@ -8,7 +8,7 @@
 *
 *  DATE:        15 Jan 2016
 *
-*  Common header file ZeroAccess loader unit.
+*  Common header file for ZeroAccess loader routines.
 *
 * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED

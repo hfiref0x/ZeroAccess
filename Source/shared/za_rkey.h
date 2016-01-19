@@ -4,9 +4,9 @@
 *
 *  TITLE:       ZA_RKEY.H
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        10 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  ZeroAccess RSA keys.
 *

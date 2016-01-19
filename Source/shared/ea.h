@@ -4,9 +4,9 @@
 *
 *  TITLE:       EA.H
 *
-*  VERSION:     1.0
+*  VERSION:     1.01
 *
-*  DATE:        12 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  ZeroAccess EA support routines header file.
 *

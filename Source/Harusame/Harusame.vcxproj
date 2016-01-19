@@ -78,6 +78,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>.\output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>.\output\$(Platform)\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

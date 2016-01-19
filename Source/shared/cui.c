@@ -4,9 +4,9 @@
 *
 *  TITLE:       CUI.C
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        15 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  Console output.
 *
@@ -28,29 +28,37 @@
 *
 */
 VOID SfcuiPrintText(
-	HANDLE hOutConsole,
-	LPWSTR lpText,
-	BOOL ConsoleOutputEnabled,
-	BOOL UseReturn
+	_In_ HANDLE hOutConsole,
+	_In_ LPWSTR lpText,
+	_In_ BOOL ConsoleOutputEnabled,
+	_In_ BOOL UseReturn
 	)
 {
-	DWORD consoleIO;
-	PTCHAR Buffer;
+	SIZE_T consoleIO;
+	DWORD bytesIO;
+	LPWSTR Buffer;
 
-	consoleIO = (DWORD)_strlen(lpText) * sizeof(WCHAR) + 4 + sizeof(UNICODE_NULL);
-	Buffer = (PTCHAR)RtlAllocateHeap(RtlGetCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, consoleIO);
+	if (lpText == NULL)
+		return;
+
+	consoleIO = _strlen(lpText);
+	if ((consoleIO == 0) || (consoleIO > MAX_PATH * 4))
+		return;
+
+	consoleIO = consoleIO * sizeof(WCHAR) + 4 + sizeof(UNICODE_NULL);
+	Buffer = (LPWSTR)RtlAllocateHeap(RtlGetCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, consoleIO);
 	if (Buffer) {
 
 		_strcpy(Buffer, lpText);
 		if (UseReturn) _strcat(Buffer, TEXT("\r\n"));
 
-		consoleIO = (DWORD)_strlen(Buffer);
+		consoleIO = _strlen(Buffer);
 
 		if (ConsoleOutputEnabled == TRUE) {
-			WriteConsole(hOutConsole, Buffer, consoleIO, &consoleIO, NULL);
+			WriteConsole(hOutConsole, Buffer, (DWORD)consoleIO, &bytesIO, NULL);
 		}
 		else {
-			WriteFile(hOutConsole, Buffer, consoleIO * sizeof(TCHAR), &consoleIO, NULL);
+			WriteFile(hOutConsole, Buffer, (DWORD)(consoleIO * sizeof(WCHAR)), &bytesIO, NULL);
 		}
 		RtlFreeHeap(RtlGetCurrentPeb()->ProcessHeap, 0, Buffer);
 	}

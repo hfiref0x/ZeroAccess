@@ -4,9 +4,9 @@
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        15 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  Harusame program entry point.
 *
@@ -46,7 +46,7 @@ UINT SfProcessCmdLine(
 	)
 {
 	ULONG        rlen, uMode = 32;
-	WCHAR        InputFile[MAX_PATH + 1];
+	WCHAR        szInputFile[MAX_PATH + 1];
 	WCHAR        szMode[MAX_PATH + 1];
 	NTSTATUS     status;
 	PBYTE        pKey;
@@ -54,8 +54,8 @@ UINT SfProcessCmdLine(
 
 	//path
 	rlen = 0;
-	RtlSecureZeroMemory(InputFile, sizeof(InputFile));
-	GetCommandLineParam(GetCommandLine(), 1, InputFile, MAX_PATH, &rlen);
+	RtlSecureZeroMemory(szInputFile, sizeof(szInputFile));
+	GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&szInputFile, MAX_PATH, &rlen);
 	if (rlen == 0) {
 		SfcuiPrintText(g_ConOut,
 			T_SFCHECKUSAGE,
@@ -64,8 +64,9 @@ UINT SfProcessCmdLine(
 	}
 
 	//type
+	rlen = 0;
 	RtlSecureZeroMemory(&szMode, sizeof(szMode));
-	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, sizeof(szMode), &rlen);
+	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, MAX_PATH, &rlen);
 	if (rlen == 0) {
 		uMode = 32;
 	}
@@ -89,11 +90,11 @@ UINT SfProcessCmdLine(
 		KeySize = sizeof(ZA_key64);
 	}
 
-	status = SfcIsFileLegit(InputFile, pKey, KeySize);
+	status = SfcIsFileLegit(szInputFile, pKey, KeySize);
 
 	//print result
 	SfcuiPrintText(g_ConOut,
-		InputFile,
+		szInputFile,
 		g_ConsoleOutput, TRUE);
 
 	_strcpy(szMode, TEXT("Verification mode: "));

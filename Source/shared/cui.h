@@ -4,9 +4,9 @@
 *
 *  TITLE:       CUI.H
 *
-*  VERSION:     1.0
+*  VERSION:     1.01
 *
-*  DATE:        15 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  Common header file for console ui.
 *
@@ -19,9 +19,11 @@
 
 #pragma once
 
+#include "global.h"
+
 VOID SfcuiPrintText(
-	HANDLE hOutConsole,
-	LPWSTR lpText,
-	BOOL ConsoleOutputEnabled,
-	BOOL UseReturn
+	_In_ HANDLE hOutConsole,
+	_In_ LPWSTR lpText,
+	_In_ BOOL ConsoleOutputEnabled,
+	_In_ BOOL UseReturn
 	);

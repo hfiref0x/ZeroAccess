@@ -4,9 +4,9 @@
 *
 *  TITLE:       CAB.C
 *
-*  VERSION:     1.0
+*  VERSION:     1.00
 *
-*  DATE:        15 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  ZeroAccess cabinet extraction from memory buffer.
 *

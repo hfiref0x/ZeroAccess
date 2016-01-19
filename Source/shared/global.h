@@ -4,9 +4,9 @@
 *
 *  TITLE:       GLOBAL.H
 *
-*  VERSION:     1.0
+*  VERSION:     1.01
 *
-*  DATE:        16 Jan 2016
+*  DATE:        19 Jan 2016
 *
 *  Common header file for the program support routines.
 *
@@ -48,6 +48,7 @@
 #include <intrin.h>
 
 #include "..\minirtl\minirtl.h"
+#include "..\minirtl\rtltypes.h"
 #include "..\minirtl\_filename.h"
 #include "..\minirtl\cmdline.h"
 

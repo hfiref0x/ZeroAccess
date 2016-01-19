@@ -4,9 +4,9 @@
 *
 *  TITLE:       P2P.C
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        18 Jan 2016
+*  DATE:        19 Jan 2016
 *
 *  Yuudachi poi2poi.
 *
@@ -210,8 +210,15 @@ BOOL SfNDownloadFile(
 		ultostr(ntohs(io_addr.sin_port), _strend(szText));
 		SfUIAddEvent(ScanContext, GUI_EVENT_DOWNLOAD_FILE, szText);
 
-		if (connect(st, (struct sockaddr *)&io_addr, sizeof(io_addr)) != 0)
+		if (connect(st, (struct sockaddr *)&io_addr, sizeof(io_addr)) != 0) {
+			_strcpy(szText, TEXT(">>> "));
+			RtlIpv4AddressToStringW((const struct in_addr*)&io_addr.sin_addr, _strend(szText));
+			_strcat(szText, TEXT(":"));
+			ultostr(ntohs(io_addr.sin_port), _strend(szText));
+			_strcat(szText, TEXT(" <- connection attempt timed out"));
+			SfUIAddEvent(ScanContext, GUI_EVENT_DOWNLOAD_FILE, szText);
 			break;
+		}
 
 		SfUIAddEvent(ScanContext, GUI_EVENT_DOWNLOAD_FILE, TEXT(">>> <- connected OK"));
 
@@ -228,7 +235,7 @@ BOOL SfNDownloadFile(
 			break;
 
 		if ((ULONG)recv_size < FileHeader->Size) {
-			SfUIAddEvent(ScanContext, GUI_EVENT_DOWNLOAD_FILE, TEXT("Received size is not equal to the header."));
+			SfUIAddEvent(ScanContext, GUI_EVENT_DOWNLOAD_FILE, TEXT(">>> received size is not equal to the header"));
 			break;
 		}
 
@@ -304,7 +311,6 @@ VOID SfNAddFileHeader(
 			OutputDebugString(TEXT("Received file header already in the list\r\n"));
 #endif			
 			return;
-
 		}
 	}
 
@@ -345,7 +351,6 @@ VOID SfNAddFileHeader(
 		_strcat(text, TEXT(" -> verification FAILED, file header tampered"));
 	}
 	SfUIAddEvent(ScanContext, GUI_EVENT_FILE_HEADER, text);
-
 }
 
 /*
@@ -498,6 +503,10 @@ DWORD WINAPI SfNgetLSender(
 	}
 	RtlLeaveCriticalSection(&ScanContext->csTableLock);
 
+	//memory error
+	if (CurrentState == NULL)
+		return (DWORD)-1;
+
 	c = 0;
 	_qsort(CurrentState, n, sizeof(ZA_PEERINFO), &SfQSortCompare);
 
@@ -553,12 +562,15 @@ DWORD WINAPI SfNgetLSender(
 
 			RtlLeaveCriticalSection(&ScanContext->csTableLock);
 
+			//memory error
+			if (CurrentState == NULL)
+				break;
+
 			c = 0;
 			_qsort(CurrentState, n, sizeof(ZA_PEERINFO), &SfQSortCompare);
 
 			Sleep(1000);
 			continue;
-
 		}
 		Sleep(1000);
 	}
@@ -1001,11 +1013,11 @@ BOOL SfNStartup(
 			0
 			);
 
+		RtlFreeUnicodeString(&usName);
+
 		if (!NT_SUCCESS(status))
 			break;
 	
-		RtlFreeUnicodeString(&usName);
-
 		usName.Buffer = L"U";
 		usName.Length = 2;
 		usName.MaximumLength = 4;

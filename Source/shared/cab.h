@@ -4,9 +4,9 @@
 *
 *  TITLE:       CAB.H
 *
-*  VERSION:     1.0
+*  VERSION:     1.01
 *
-*  DATE:        15 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  Common header file for ZeroAccess cabinet extraction support.
 *

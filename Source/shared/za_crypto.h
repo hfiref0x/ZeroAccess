@@ -4,9 +4,9 @@
 *
 *  TITLE:       ZA_CRYPTO.H
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        17 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  ZeroAccess cryptography.
 *
@@ -25,7 +25,7 @@ NTSTATUS SfcIsFileLegit(
 	);
 
 BOOL SfcValidateFileHeader(
-	HCRYPTPROV hCryptoProv,
-	HCRYPTKEY hCryptKey,
-	ZA_FILEHEADER *FileHeader
+	_In_ HCRYPTPROV hCryptoProv,
+	_In_ HCRYPTKEY hCryptKey,
+	_In_ ZA_FILEHEADER *FileHeader
 	);

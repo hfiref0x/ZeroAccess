@@ -4,9 +4,9 @@
 *
 *  TITLE:       ZA_CRYPTO.C
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        17 Jan 2016
+*  DATE:        18 Jan 2016
 *
 *  ZeroAccess routines used for cryptography purposes.
 *
@@ -221,9 +221,9 @@ NTSTATUS SfcIsFileLegit(
 *
 */
 BOOL SfcValidateFileHeader(
-	HCRYPTPROV hCryptoProv,
-	HCRYPTKEY hCryptKey,
-	ZA_FILEHEADER *FileHeader
+	_In_ HCRYPTPROV hCryptoProv,
+	_In_ HCRYPTKEY hCryptKey,
+	_In_ ZA_FILEHEADER *FileHeader
 	)
 {
 	BOOL bResult, cond = FALSE;
@@ -231,6 +231,9 @@ BOOL SfcValidateFileHeader(
 	MD5_CTX      ctx;
 
 	bResult = FALSE;
+
+	if (FileHeader == NULL)
+		return FALSE;
 
 	do {
 
