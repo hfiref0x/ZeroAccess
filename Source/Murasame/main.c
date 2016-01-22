@@ -4,9 +4,9 @@
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        18 Jan 2016
+*  DATE:        20 Jan 2016
 *
 *  Murasame program entry point.
 *
@@ -34,6 +34,7 @@ BOOL g_ConsoleOutput = FALSE;
 #define T_SFEXTRACTUSAGE L"Usage: zaextract inputfile [outputfile] hexkey\n\r\te.g. zaextract dropper.bin extracted.bin 0x12345678\r\n"
 #define T_SFEXTRACTED    L"File extracted "
 #define T_SFEXTRACTFAIL  L"\r\nError while extracting file"
+#define T_SFINITFAILED   L"Required GDI+ routines cannot be found"
 #define T_SFPRESSANYKEY  L"\r\nPress Enter to exit"
 
 /*
@@ -56,7 +57,7 @@ UINT SfExtractDropper(
 	WCHAR                 szOutputFile[MAX_PATH + 1];
 	WCHAR                 szKey[MAX_PATH];
 	PVOID                 ImageBase = NULL, EncryptedData = NULL, DecryptedData = NULL;
-	IStream              *MemoryStream;
+	IStream              *pImageStream;
 	ULONG_PTR             gdiplusToken = 0;
 	GdiplusStartupInput   input;
 	GdiplusStartupOutput  output;
@@ -113,8 +114,8 @@ UINT SfExtractDropper(
 		if ((EncryptedData == NULL) || (c == 0))
 			break;
 
-		MemoryStream = SHCreateMemStream((BYTE *)EncryptedData, (UINT)c);
-		if (MemoryStream == NULL)
+		pImageStream = SHCreateMemStream((BYTE *)EncryptedData, (UINT)c);
+		if (pImageStream == NULL)
 			break;
 
 		RtlSecureZeroMemory(&input, sizeof(input));
@@ -125,7 +126,7 @@ UINT SfExtractDropper(
 			break;
 
 		BitmapPtr = NULL;
-		if (GdipCreateBitmapFromStream(MemoryStream, &BitmapPtr) != GdiplusOk)
+		if (GdipCreateBitmapFromStream(pImageStream, &BitmapPtr) != GdiplusOk)
 			break;
 
 		RtlSecureZeroMemory(&rect, sizeof(rect));
@@ -181,6 +182,10 @@ UINT SfExtractDropper(
 			g_ConsoleOutput, TRUE);
 	}
 
+	if (pImageStream != NULL) {
+		pImageStream->lpVtbl->Release(pImageStream);
+	}
+
 	if (ImageBase != NULL) {
 		NtUnmapViewOfSection(NtCurrentProcess(), ImageBase);
 	}
@@ -192,6 +197,7 @@ UINT SfExtractDropper(
 	if (gdiplusToken != 0) {
 		GdiplusShutdown(gdiplusToken);
 	}
+
 	return 0;
 }
 
@@ -237,6 +243,11 @@ void SfMain(
 		if (SfInitGdiPlus()) {
 			uResult = SfExtractDropper(GetCommandLine());
 		}
+		else {
+			SfcuiPrintText(g_ConOut,
+				T_SFINITFAILED,
+				g_ConsoleOutput, FALSE);
+		}
 
 		if (g_ConsoleOutput) {
 
@@ -245,9 +256,11 @@ void SfMain(
 				TRUE, FALSE);
 
 			StdIn = GetStdHandle(STD_INPUT_HANDLE);
-			RtlSecureZeroMemory(&inp1, sizeof(inp1));
-			ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
-			ReadConsole(StdIn, &BE, sizeof(BE), &dwTemp, NULL);
+			if (StdIn != INVALID_HANDLE_VALUE) {
+				RtlSecureZeroMemory(&inp1, sizeof(inp1));
+				ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
+				ReadConsole(StdIn, &BE, sizeof(BE), &dwTemp, NULL);
+			}
 		}
 
 	} while (cond);

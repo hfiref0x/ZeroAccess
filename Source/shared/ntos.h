@@ -3579,6 +3579,7 @@ ULONG NTAPI CsrGetProcessId(
 /*
 ** Runtime Library API START
 */
+
 ULONG NTAPI RtlRandomEx(
 	_Inout_ PULONG Seed
 	);

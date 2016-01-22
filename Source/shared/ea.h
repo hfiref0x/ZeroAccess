@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.01
 *
-*  DATE:        18 Jan 2016
+*  DATE:        19 Jan 2016
 *
 *  ZeroAccess EA support routines header file.
 *

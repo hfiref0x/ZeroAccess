@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.01
 *
-*  DATE:        19 Jan 2016
+*  DATE:        21 Jan 2016
 *
 *  Yuudachi poi2poi.
 *
@@ -245,7 +245,7 @@ BOOL SfNDownloadFile(
 		rc4_init(&rc4ctx, (const unsigned char *)&ctx.digest, sizeof(ctx.digest));
 		rc4_crypt(&rc4ctx, recvbuffer, recvbuffer, recv_size);
 
-		_strcpy(szText, TEXT("U\\p2pfile-ip-"));
+		_strcpy(szText, TEXT("U\\ip-"));
 		RtlIpv4AddressToStringW((const struct in_addr*)&io_addr.sin_addr, _strend(szText));
 		_strcat(szText, TEXT("-port-"));
 		ultostr(ntohs(io_addr.sin_port), _strend(szText));
@@ -261,8 +261,8 @@ BOOL SfNDownloadFile(
 		bResult = SfNStoreFile(ScanContext, szText, recvbuffer, recv_size, FileHeader);
 
 		if (bResult) {
+			_strcat(szText, TEXT(" file saved OK"));
 			SfUIAddEvent(ScanContext, GUI_EVENT_DOWNLOAD_FILE, szText);
-			SfUIAddEvent(ScanContext, GUI_EVENT_DOWNLOAD_FILE, TEXT(">>> file saved OK"));
 		}
 		else {
 			SfUIAddEvent(ScanContext, GUI_EVENT_ERROR, TEXT(">>> error saving file"));
@@ -343,7 +343,7 @@ VOID SfNAddFileHeader(
 	if (SfcValidateFileHeader(ScanContext->CryptoProv, ScanContext->CryptoKey, hdr)) {
 		_strcat(text, TEXT(" -> verified OK, processing download"));
 		if (SfNDownloadFile(ScanContext, hdr, in_peer)) {
-			ScanContext->FileHeaders[ScanContext->NumberOfFiles] = *hdr;
+			RtlCopyMemory(&ScanContext->FileHeaders[ScanContext->NumberOfFiles], hdr, sizeof(ZA_FILEHEADER));
 			ScanContext->NumberOfFiles++;
 		}
 	}
@@ -780,6 +780,8 @@ VOID WINAPI SfNWorkerThread(
 		if (!CryptAcquireContext(&ScanContext->CryptoProv, NULL, MS_DEF_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
 			break;
 
+		k = ~GetTickCount();
+		ScanContext->SessionId = RtlRandomEx(&k);
 		if (!CryptGenRandom(ScanContext->CryptoProv, (DWORD)sizeof(ULONG), (BYTE*)&ScanContext->SessionId))
 			break;
 

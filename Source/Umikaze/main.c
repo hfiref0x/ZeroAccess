@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.01
 *
-*  DATE:        18 Jan 2016
+*  DATE:        20 Jan 2016
 *
 *  Umikaze program entry point.
 *
@@ -301,9 +301,11 @@ void SfMain(
 				TRUE, FALSE);
 
 			StdIn = GetStdHandle(STD_INPUT_HANDLE);
-			RtlSecureZeroMemory(&inp1, sizeof(inp1));
-			ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
-			ReadConsole(StdIn, &BE, sizeof(BE), &dwTemp, NULL);
+			if (StdIn != INVALID_HANDLE_VALUE) {
+				RtlSecureZeroMemory(&inp1, sizeof(inp1));
+				ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
+				ReadConsole(StdIn, &BE, sizeof(BE), &dwTemp, NULL);
+			}
 		}
 
 	} while (cond);

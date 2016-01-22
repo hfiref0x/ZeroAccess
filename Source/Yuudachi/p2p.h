@@ -36,7 +36,7 @@
 #endif
 
 //client tcp port
-#define TCP_PORT                    UDP_PORT + 1
+#define TCP_PORT                    UDP_PORT
 
 //p2p protocol const
 
