@@ -182,14 +182,6 @@ UINT SfExtractDropper(
 			g_ConsoleOutput, TRUE);
 	}
 
-	if (pImageStream != NULL) {
-		pImageStream->lpVtbl->Release(pImageStream);
-	}
-
-	if (ImageBase != NULL) {
-		NtUnmapViewOfSection(NtCurrentProcess(), ImageBase);
-	}
-
 	if (BitmapPtr != NULL) {
 		GdipDisposeImage(&BitmapPtr);
 	}
@@ -198,6 +190,13 @@ UINT SfExtractDropper(
 		GdiplusShutdown(gdiplusToken);
 	}
 
+	if (pImageStream != NULL) {
+		pImageStream->lpVtbl->Release(pImageStream);
+	}
+
+	if (ImageBase != NULL) {
+		NtUnmapViewOfSection(NtCurrentProcess(), ImageBase);
+	}
 	return 0;
 }
 

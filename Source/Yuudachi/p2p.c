@@ -6,7 +6,7 @@
 *
 *  VERSION:     1.01
 *
-*  DATE:        21 Jan 2016
+*  DATE:        22 Jan 2016
 *
 *  Yuudachi poi2poi.
 *
@@ -888,13 +888,7 @@ VOID WINAPI SfNWorkerThread(
 
 		RtlSecureZeroMemory(&io_addr, sizeof(io_addr));
 		io_addr.sin_family = AF_INET;
-
-#ifdef _WIN64
 		io_addr.sin_port = htons((u_short)UDP_PORT);
-#else
-		io_addr.sin_port = htons((u_short)UDP_PORT);
-#endif
-
 		if (bind(su, (struct sockaddr *)&io_addr, sizeof(io_addr)) != 0)
 			break;
 

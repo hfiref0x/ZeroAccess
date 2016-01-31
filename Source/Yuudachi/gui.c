@@ -4,9 +4,9 @@
 *
 *  TITLE:       GUI.C
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        18 Jan 2016
+*  DATE:        22 Jan 2016
 *
 *  Yuudachi GUI support routines.
 *
@@ -213,7 +213,6 @@ void SfUICreateControls(
 	HWND hwndParent
 	)
 {
-	RECT        r1;
 	LVCOLUMNW   col;
 	INT         status_parts[5];
 	RECT        client_rect;
@@ -236,8 +235,6 @@ void SfUICreateControls(
 		SendMessage(g_guictx.StatusBar, SB_SETPARTS, (WPARAM)4, (LPARAM)&status_parts);
 	}
 
-	RtlSecureZeroMemory(&r1, sizeof(r1));
-	GetClientRect(g_guictx.MainWindow, &r1);
 	g_guictx.OutputWindow = CreateWindowEx(
 		0,
 		WC_LISTVIEW,
