@@ -21,7 +21,7 @@
 #include "..\shared\cui.h"
 
 HANDLE g_ConOut = NULL;
-WCHAR BE = 0xFEFF;
+WCHAR g_BE = 0xFEFF;
 BOOL g_ConsoleOutput = FALSE;
 
 #define T_SFDECODETITLE L"Sirefef/ZeroAccess 3 peer list decoder v1.0 (10/01/16)"
@@ -113,7 +113,7 @@ NTSTATUS SfDecodePeerList(
 		if (!NT_SUCCESS(status))
 			break;
 		
-		NtWriteFile(hFile, NULL, NULL, NULL, &iost, &BE, sizeof(BE), NULL, NULL);
+		NtWriteFile(hFile, NULL, NULL, NULL, &iost, &g_BE, sizeof(g_BE), NULL, NULL);
 
 		c = fsi.EndOfFile.LowPart / sizeof(ZA_PEERINFO);
 		for (i = 0, j = 0; i < c; i += 1, j += sizeof(ZA_PEERINFO)) {
@@ -289,7 +289,7 @@ void SfMain(
 		SetConsoleTitle(T_SFDECODETITLE);
 		SetConsoleMode(g_ConOut, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT);
 		if (g_ConsoleOutput == FALSE) {
-			WriteFile(g_ConOut, &BE, sizeof(WCHAR), &dwTemp, NULL);
+			WriteFile(g_ConOut, &g_BE, sizeof(WCHAR), &dwTemp, NULL);
 		}
 
 		uResult = SfProcessCmdLine(GetCommandLine());
@@ -304,7 +304,7 @@ void SfMain(
 			if (StdIn != INVALID_HANDLE_VALUE) {
 				RtlSecureZeroMemory(&inp1, sizeof(inp1));
 				ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
-				ReadConsole(StdIn, &BE, sizeof(BE), &dwTemp, NULL);
+				ReadConsole(StdIn, &g_BE, sizeof(g_BE), &dwTemp, NULL);
 			}
 		}
 

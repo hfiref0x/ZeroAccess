@@ -57,7 +57,7 @@ UINT SfExtractDropper(
 	WCHAR                 szOutputFile[MAX_PATH + 1];
 	WCHAR                 szKey[MAX_PATH];
 	PVOID                 ImageBase = NULL, EncryptedData = NULL, DecryptedData = NULL;
-	IStream              *pImageStream;
+	IStream              *pImageStream = NULL;
 	ULONG_PTR             gdiplusToken = 0;
 	GdiplusStartupInput   input;
 	GdiplusStartupOutput  output;

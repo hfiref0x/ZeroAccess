@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\minirtl\_filename.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
     <ClCompile Include="..\minirtl\_strcat.c">
       <Filter>minirtl</Filter>
     </ClCompile>
@@ -114,11 +111,11 @@
     <ClCompile Include="..\shared\ldr.c">
       <Filter>shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\minirtl\_filename.c">
+      <Filter>minirtl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\minirtl\_filename.h">
-      <Filter>minirtl</Filter>
-    </ClInclude>
     <ClInclude Include="..\minirtl\cmdline.h">
       <Filter>minirtl</Filter>
     </ClInclude>
@@ -154,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="..\shared\ldr.h">
       <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\minirtl\_filename.h">
+      <Filter>minirtl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,9 +4,9 @@
 *
 *  TITLE:       NTOS.H
 *
-*  VERSION:     1.31
+*  VERSION:     1.32
 *
-*  DATE:        18 Jan 2016
+*  DATE:        30 Jan 2016
 *
 *  Common header file for the ntos API functions and definitions.
 *
@@ -195,6 +195,36 @@ typedef struct _SEMAPHORE_BASIC_INFORMATION {
 
 /*
 ** Semaphore END
+*/
+
+/*
+** FileCache and MemoryList START
+*/
+
+typedef enum _SYSTEM_MEMORY_LIST_COMMAND {
+	MemoryCaptureAccessedBits,
+	MemoryCaptureAndResetAccessedBits,
+	MemoryEmptyWorkingSets,
+	MemoryFlushModifiedList,
+	MemoryPurgeStandbyList,
+	MemoryPurgeLowPriorityStandbyList,
+	MemoryCommandMax
+} SYSTEM_MEMORY_LIST_COMMAND;
+
+typedef struct _SYSTEM_FILECACHE_INFORMATION {
+	SIZE_T CurrentSize;
+	SIZE_T PeakSize;
+	ULONG PageFaultCount;
+	SIZE_T MinimumWorkingSet;
+	SIZE_T MaximumWorkingSet;
+	SIZE_T CurrentSizeIncludingTransitionInPages;
+	SIZE_T PeakSizeIncludingTransitionInPages;
+	ULONG TransitionRePurposeCount;
+	ULONG Flags;
+} SYSTEM_FILECACHE_INFORMATION, *PSYSTEM_FILECACHE_INFORMATION;
+
+/*
+** FileCache and MemoryList END
 */
 
 /*

@@ -69,9 +69,6 @@
     <ClCompile Include="..\minirtl\strtoul.c">
       <Filter>minirtl</Filter>
     </ClCompile>
-    <ClCompile Include="..\minirtl\_filename.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
     <ClCompile Include="..\minirtl\_strstr.c">
       <Filter>minirtl</Filter>
     </ClCompile>
@@ -136,9 +133,6 @@
     </ClInclude>
     <ClInclude Include="..\shared\global.h">
       <Filter>shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\minirtl\_filename.h">
-      <Filter>minirtl</Filter>
     </ClInclude>
     <ClInclude Include="..\minirtl\cmdline.h">
       <Filter>minirtl</Filter>

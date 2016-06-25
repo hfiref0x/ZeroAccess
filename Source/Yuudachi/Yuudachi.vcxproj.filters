@@ -30,9 +30,6 @@
     <ClCompile Include="p2p.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\minirtl\_filename.c">
-      <Filter>minirtl</Filter>
-    </ClCompile>
     <ClCompile Include="..\minirtl\_strcat.c">
       <Filter>minirtl</Filter>
     </ClCompile>
@@ -123,6 +120,9 @@
     <ClCompile Include="..\shared\za_crypto.c">
       <Filter>shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\minirtl\_filename.c">
+      <Filter>minirtl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui.h">
@@ -130,9 +130,6 @@
     </ClInclude>
     <ClInclude Include="p2p.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\minirtl\_filename.h">
-      <Filter>minirtl</Filter>
     </ClInclude>
     <ClInclude Include="..\minirtl\cmdline.h">
       <Filter>minirtl</Filter>
@@ -172,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="..\shared\za_crypto.h">
       <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\minirtl\_filename.h">
+      <Filter>minirtl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
