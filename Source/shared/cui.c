@@ -1,12 +1,12 @@
 /*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2016
+*  (C) COPYRIGHT AUTHORS, 2016 - 2017
 *
 *  TITLE:       CUI.C
 *
-*  VERSION:     1.01
+*  VERSION:     1.02
 *
-*  DATE:        18 Jan 2016
+*  DATE:        01 Dec 2017
 *
 *  Console output.
 *
@@ -28,38 +28,38 @@
 *
 */
 VOID SfcuiPrintText(
-	_In_ HANDLE hOutConsole,
-	_In_ LPWSTR lpText,
-	_In_ BOOL ConsoleOutputEnabled,
-	_In_ BOOL UseReturn
-	)
+    _In_ HANDLE hOutConsole,
+    _In_ LPWSTR lpText,
+    _In_ BOOL ConsoleOutputEnabled,
+    _In_ BOOL UseReturn
+)
 {
-	SIZE_T consoleIO;
-	DWORD bytesIO;
-	LPWSTR Buffer;
+    SIZE_T consoleIO;
+    DWORD bytesIO;
+    LPWSTR Buffer;
 
-	if (lpText == NULL)
-		return;
+    if (lpText == NULL)
+        return;
 
-	consoleIO = _strlen(lpText);
-	if ((consoleIO == 0) || (consoleIO > MAX_PATH * 4))
-		return;
+    consoleIO = _strlen(lpText);
+    if ((consoleIO == 0) || (consoleIO > MAX_PATH * 4))
+        return;
 
-	consoleIO = consoleIO * sizeof(WCHAR) + 4 + sizeof(UNICODE_NULL);
-	Buffer = (LPWSTR)RtlAllocateHeap(RtlGetCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, consoleIO);
-	if (Buffer) {
+    consoleIO = consoleIO * sizeof(WCHAR) + 4 + sizeof(UNICODE_NULL);
+    Buffer = (LPWSTR)RtlAllocateHeap(RtlGetCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, consoleIO);
+    if (Buffer) {
 
-		_strcpy(Buffer, lpText);
-		if (UseReturn) _strcat(Buffer, TEXT("\r\n"));
+        _strcpy(Buffer, lpText);
+        if (UseReturn) _strcat(Buffer, TEXT("\r\n"));
 
-		consoleIO = _strlen(Buffer);
+        consoleIO = _strlen(Buffer);
 
-		if (ConsoleOutputEnabled == TRUE) {
-			WriteConsole(hOutConsole, Buffer, (DWORD)consoleIO, &bytesIO, NULL);
-		}
-		else {
-			WriteFile(hOutConsole, Buffer, (DWORD)(consoleIO * sizeof(WCHAR)), &bytesIO, NULL);
-		}
-		RtlFreeHeap(RtlGetCurrentPeb()->ProcessHeap, 0, Buffer);
-	}
+        if (ConsoleOutputEnabled != FALSE) {
+            WriteConsole(hOutConsole, Buffer, (DWORD)consoleIO, &bytesIO, NULL);
+        }
+        else {
+            WriteFile(hOutConsole, Buffer, (DWORD)(consoleIO * sizeof(WCHAR)), &bytesIO, NULL);
+        }
+        RtlFreeHeap(RtlGetCurrentPeb()->ProcessHeap, 0, Buffer);
+    }
 }

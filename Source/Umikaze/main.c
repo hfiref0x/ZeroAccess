@@ -1,12 +1,12 @@
 /*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2016
+*  (C) COPYRIGHT AUTHORS, 2016 - 2017
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.01
+*  VERSION:     1.02
 *
-*  DATE:        20 Jan 2016
+*  DATE:        01 Dec 2017
 *
 *  Umikaze program entry point.
 *
@@ -41,121 +41,131 @@ BOOL g_ConsoleOutput = FALSE;
 *
 */
 NTSTATUS SfDecodePeerList(
-	LPWSTR lpInFileName,
-	LPWSTR lpOutFileName,
-	ULONG uType
-	)
+    LPWSTR lpInFileName,
+    LPWSTR lpOutFileName,
+    ULONG uType
+)
 {
-	BOOL                       cond = FALSE;
-	NTSTATUS                   status = STATUS_UNSUCCESSFUL;
-	HANDLE                     hFile = NULL;
-	OBJECT_ATTRIBUTES          obja;
-	IO_STATUS_BLOCK            iost;
-	UNICODE_STRING             NtFileName;
-	FILE_STANDARD_INFORMATION  fsi;
-	PUCHAR                     FileBuffer = NULL;
-	
-	ULONG         i, j, c, Port;
-	PZA_PEERINFO  peer;
-	LARGE_INTEGER ftime;
-	SYSTEMTIME    st1;
-	WCHAR         text[MAX_PATH + 1];
+    BOOL                       cond = FALSE;
+    NTSTATUS                   status = STATUS_UNSUCCESSFUL;
+    HANDLE                     hFile = NULL;
+    OBJECT_ATTRIBUTES          obja;
+    IO_STATUS_BLOCK            iost;
+    UNICODE_STRING             NtFileName;
+    FILE_STANDARD_INFORMATION  fsi;
+    PUCHAR                     FileBuffer = NULL;
 
-	RtlSecureZeroMemory(&NtFileName, sizeof(NtFileName));
+    ULONG         i, j, c, Port, bytesIO;
+    PZA_PEERINFO  peer;
+    LARGE_INTEGER ftime;
+    SYSTEMTIME    st1;
+    WCHAR         text[MAX_PATH + 1];
 
-	do {
-		//open input file
-		if (RtlDosPathNameToNtPathName_U(lpInFileName, &NtFileName, NULL, NULL) == FALSE)
-			break;
+    RtlSecureZeroMemory(&NtFileName, sizeof(NtFileName));
 
-		InitializeObjectAttributes(&obja, &NtFileName, OBJ_CASE_INSENSITIVE, 0, NULL);
-		status = NtCreateFile(&hFile, FILE_READ_ACCESS | SYNCHRONIZE, &obja, &iost, NULL, 0,
-			FILE_SHARE_READ, FILE_OPEN,
-			FILE_SYNCHRONOUS_IO_NONALERT | FILE_NON_DIRECTORY_FILE, NULL, 0);
-		if (!NT_SUCCESS(status))
-			break;
+    do {
+        //open input file
+        if (RtlDosPathNameToNtPathName_U(lpInFileName, &NtFileName, NULL, NULL) == FALSE)
+            break;
 
-		//get file size
-		status = NtQueryInformationFile(hFile, &iost, &fsi,
-			sizeof(FILE_STANDARD_INFORMATION),
-			FileStandardInformation);
-		if (!NT_SUCCESS(status))
-			break;
+        InitializeObjectAttributes(&obja, &NtFileName, OBJ_CASE_INSENSITIVE, 0, NULL);
+        status = NtCreateFile(&hFile, FILE_READ_ACCESS | SYNCHRONIZE, &obja, &iost, NULL, 0,
+            FILE_SHARE_READ, FILE_OPEN,
+            FILE_SYNCHRONOUS_IO_NONALERT | FILE_NON_DIRECTORY_FILE, NULL, 0);
+        if (!NT_SUCCESS(status))
+            break;
 
-		c = fsi.EndOfFile.LowPart % sizeof(ZA_PEERINFO);
-		if (c != 0) {
-			status = STATUS_BAD_DATA;
-			break;
-		}
+        //get file size
+        status = NtQueryInformationFile(hFile, &iost, &fsi,
+            sizeof(FILE_STANDARD_INFORMATION),
+            FileStandardInformation);
+        if (!NT_SUCCESS(status))
+            break;
 
-		FileBuffer = RtlAllocateHeap(NtCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, fsi.EndOfFile.LowPart);
-		if (FileBuffer == NULL)
-			break;
+        c = fsi.EndOfFile.LowPart % sizeof(ZA_PEERINFO);
+        if (c != 0) {
+            status = STATUS_BAD_DATA;
+            break;
+        }
 
-		//read file to buffer
-		status = NtReadFile(hFile, NULL, NULL, NULL, &iost, FileBuffer, fsi.EndOfFile.LowPart, NULL, NULL);
-		if (!NT_SUCCESS(status))
-			break;
+        FileBuffer = RtlAllocateHeap(NtCurrentPeb()->ProcessHeap, HEAP_ZERO_MEMORY, fsi.EndOfFile.LowPart);
+        if (FileBuffer == NULL)
+            break;
 
-		//close input file
-		NtClose(hFile);
-		hFile = NULL;
-		RtlFreeUnicodeString(&NtFileName);
+        //read file to buffer
+        status = NtReadFile(hFile, NULL, NULL, NULL, &iost, FileBuffer, fsi.EndOfFile.LowPart, NULL, NULL);
+        if (!NT_SUCCESS(status))
+            break;
 
-		//create output file
-		if (RtlDosPathNameToNtPathName_U(lpOutFileName, &NtFileName, NULL, NULL) == FALSE)
-			break;
+        //close input file
+        NtClose(hFile);
+        hFile = NULL;
+        RtlFreeUnicodeString(&NtFileName);
 
-		InitializeObjectAttributes(&obja, &NtFileName, OBJ_CASE_INSENSITIVE, 0, NULL);
-		status = NtCreateFile(&hFile, FILE_WRITE_ACCESS | SYNCHRONIZE, &obja, &iost, NULL, 0,
-			0, FILE_OVERWRITE_IF,
-			FILE_SYNCHRONOUS_IO_NONALERT | FILE_NON_DIRECTORY_FILE, NULL, 0);
-		if (!NT_SUCCESS(status))
-			break;
-		
-		NtWriteFile(hFile, NULL, NULL, NULL, &iost, &g_BE, sizeof(g_BE), NULL, NULL);
+        //create output file
+        if (RtlDosPathNameToNtPathName_U(lpOutFileName, &NtFileName, NULL, NULL) == FALSE)
+            break;
 
-		c = fsi.EndOfFile.LowPart / sizeof(ZA_PEERINFO);
-		for (i = 0, j = 0; i < c; i += 1, j += sizeof(ZA_PEERINFO)) {
+        InitializeObjectAttributes(&obja, &NtFileName, OBJ_CASE_INSENSITIVE, 0, NULL);
+        status = NtCreateFile(&hFile, FILE_WRITE_ACCESS | SYNCHRONIZE, &obja, &iost, NULL, 0,
+            0, FILE_OVERWRITE_IF,
+            FILE_SYNCHRONOUS_IO_NONALERT | FILE_NON_DIRECTORY_FILE, NULL, 0);
+        if (!NT_SUCCESS(status))
+            break;
 
-			peer = (ZA_PEERINFO *)&FileBuffer[j];
+        NtWriteFile(hFile, NULL, NULL, NULL, &iost, &g_BE, sizeof(g_BE), NULL, NULL);
 
-			RtlSecureZeroMemory(&text, sizeof(text));
-			RtlIpv4AddressToStringW((struct in_addr*)&peer->IP, (PWSTR)&text);
+        c = fsi.EndOfFile.LowPart / sizeof(ZA_PEERINFO);
+        for (i = 0, j = 0; i < c; i += 1, j += sizeof(ZA_PEERINFO)) {
 
-			_strcat(text, TEXT(":"));
+            peer = (ZA_PEERINFO *)&FileBuffer[j];
 
-			Port = 0x4000 + (peer->Port);
-			if (uType == 64) Port += 0x4000;
-			ultostr(Port, _strend(text));
-			_strcat(text, TEXT(" "));
+            RtlSecureZeroMemory(&text, sizeof(text));
+            RtlIpv4AddressToStringW((struct in_addr*)&peer->IP, (PWSTR)&text);
 
-			RtlSecondsSince1980ToTime((peer->TimeStamp * 3600) - 0xbf000000, &ftime);
-			RtlSecureZeroMemory(&st1, sizeof(st1));
-			if (FileTimeToSystemTime((PFILETIME)&ftime, &st1)) {
-				ultostr(st1.wDay, _strend(text));
-				_strcat(text, TEXT("/"));
-				ultostr(st1.wMonth, _strend(text));
-				_strcat(text, TEXT("/"));
-				ultostr(st1.wYear, _strend(text));
-				_strcat(text, TEXT(" "));
-				ultostr(st1.wHour, _strend(text));
-				_strcat(text, TEXT(":"));
-				ultostr(st1.wMinute, _strend(text));
-				_strcat(text, TEXT(":"));
-				ultostr(st1.wSecond, _strend(text));
-			}
-			_strcat(text, TEXT("\r\n"));
-			status = NtWriteFile(hFile, NULL, NULL, NULL, &iost, text, (DWORD)_strlen(text) * sizeof(WCHAR), NULL, NULL);
-		}
+            _strcat(text, TEXT(":"));
 
-	} while (cond);
+            Port = 0x4000 + (peer->Port);
+            if (uType == 64) Port += 0x4000;
+            ultostr(Port, _strend(text));
+            _strcat(text, TEXT(" "));
 
-	if (hFile) NtClose(hFile);
-	if (FileBuffer) RtlFreeHeap(NtCurrentPeb()->ProcessHeap, 0, FileBuffer);
-	if (NtFileName.Buffer) RtlFreeUnicodeString(&NtFileName);
+            RtlSecondsSince1980ToTime((peer->TimeStamp * 3600) - 0xbf000000, &ftime);
+            RtlSecureZeroMemory(&st1, sizeof(st1));
+            if (FileTimeToSystemTime((PFILETIME)&ftime, &st1)) {
+                ultostr(st1.wDay, _strend(text));
+                _strcat(text, TEXT("/"));
+                ultostr(st1.wMonth, _strend(text));
+                _strcat(text, TEXT("/"));
+                ultostr(st1.wYear, _strend(text));
+                _strcat(text, TEXT(" "));
+                ultostr(st1.wHour, _strend(text));
+                _strcat(text, TEXT(":"));
+                ultostr(st1.wMinute, _strend(text));
+                _strcat(text, TEXT(":"));
+                ultostr(st1.wSecond, _strend(text));
+            }
+            _strcat(text, TEXT("\r\n"));
 
-	return status;
+            bytesIO = (ULONG)(_strlen(text) * sizeof(WCHAR));
+            status = NtWriteFile(hFile,
+                NULL,
+                NULL,
+                NULL,
+                &iost,
+                text,
+                bytesIO,
+                NULL,
+                NULL);
+        }
+
+    } while (cond);
+
+    if (hFile) NtClose(hFile);
+    if (FileBuffer) RtlFreeHeap(NtCurrentPeb()->ProcessHeap, 0, FileBuffer);
+    if (NtFileName.Buffer) RtlFreeUnicodeString(&NtFileName);
+
+    return status;
 }
 
 /*
@@ -167,90 +177,90 @@ NTSTATUS SfDecodePeerList(
 *
 */
 UINT SfProcessCmdLine(
-	LPWSTR lpCommandLine
-	)
+    LPWSTR lpCommandLine
+)
 {
-	NTSTATUS  status;
-	ULONG     rlen, uType = 32;
-	WCHAR     textbuf[MAX_PATH + 1], textbuf2[MAX_PATH * 2];
-	WCHAR     szMode[MAX_PATH + 1];
+    NTSTATUS  status;
+    ULONG     rlen, uType = 32;
+    WCHAR     textbuf[MAX_PATH + 1], textbuf2[MAX_PATH * 2];
+    WCHAR     szMode[MAX_PATH + 1];
 
-	//path
-	rlen = 0;
-	RtlSecureZeroMemory(&textbuf, sizeof(textbuf));
-	GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&textbuf, sizeof(textbuf), &rlen);
-	if (rlen == 0) {
+    //path
+    rlen = 0;
+    RtlSecureZeroMemory(&textbuf, sizeof(textbuf));
+    GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&textbuf, sizeof(textbuf), &rlen);
+    if (rlen == 0) {
 
-		SfcuiPrintText(g_ConOut, 
-			T_SFDECODEUSAGE,
-			g_ConsoleOutput, FALSE);
+        SfcuiPrintText(g_ConOut,
+            T_SFDECODEUSAGE,
+            g_ConsoleOutput, FALSE);
 
-		return (UINT)-1;
-	}
+        return (UINT)-1;
+    }
 
-	//type
-	rlen = 0;
-	RtlSecureZeroMemory(&szMode, sizeof(szMode));
-	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, sizeof(szMode), &rlen);
-	if (rlen == 0) {
-		uType = 32;
-	}
-	else {
-		uType = strtoul(szMode);
-		if (uType != 32 && uType != 64) {
+    //type
+    rlen = 0;
+    RtlSecureZeroMemory(&szMode, sizeof(szMode));
+    GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, sizeof(szMode), &rlen);
+    if (rlen == 0) {
+        uType = 32;
+    }
+    else {
+        uType = strtoul(szMode);
+        if (uType != 32 && uType != 64) {
 
-			SfcuiPrintText(g_ConOut,
-				T_SFDECODEMODE,
-				g_ConsoleOutput, FALSE);
+            SfcuiPrintText(g_ConOut,
+                T_SFDECODEMODE,
+                g_ConsoleOutput, FALSE);
 
-			return (UINT)-2;
-		}
-	}
+            return (UINT)-2;
+        }
+    }
 
-	_strcpy(textbuf2, textbuf);
+    _strcpy(textbuf2, textbuf);
 
-	if (uType == 32) {
-		_strcat(textbuf2, L".d32.txt");
-	}
-	else {
-		_strcat(textbuf2, L".d64.txt");
-	}
+    if (uType == 32) {
+        _strcat(textbuf2, L".d32.txt");
+    }
+    else {
+        _strcat(textbuf2, L".d64.txt");
+    }
 
-	status = SfDecodePeerList(textbuf, textbuf2, uType);
-	switch (status) {
+    status = SfDecodePeerList(textbuf, textbuf2, uType);
+    switch (status) {
 
-	
-	case STATUS_BAD_DATA:
 
-		SfcuiPrintText(g_ConOut,
-			T_SFBADDATA,
-			g_ConsoleOutput, FALSE);
+    case STATUS_BAD_DATA:
 
-		return (UINT)-3;
-		break;
+        SfcuiPrintText(g_ConOut,
+            T_SFBADDATA,
+            g_ConsoleOutput, FALSE);
 
-	case STATUS_SUCCESS:
+        return (UINT)-3;
+        break;
 
-		SfcuiPrintText(g_ConOut,
-			T_SFGENERATED,
-			g_ConsoleOutput, FALSE);
+    case STATUS_SUCCESS:
 
-		SfcuiPrintText(g_ConOut,
-			textbuf2,
-			g_ConsoleOutput, FALSE);
+        SfcuiPrintText(g_ConOut,
+            T_SFGENERATED,
+            g_ConsoleOutput, FALSE);
 
-		break;
+        SfcuiPrintText(g_ConOut,
+            textbuf2,
+            g_ConsoleOutput, FALSE);
 
-	default:
-		SfcuiPrintText(g_ConOut,
-			T_SFUNSUCCESSF,
-			g_ConsoleOutput, FALSE);
+        break;
 
-		return (UINT)-4;
-		break;
-	}
+    default:
+        SfcuiPrintText(g_ConOut,
+            T_SFUNSUCCESSF,
+            g_ConsoleOutput, FALSE);
 
-	return 0;
+        return (UINT)-4;
+        break;
+    }
+
+    return 0;
 }
 
 /*
@@ -262,53 +272,53 @@ UINT SfProcessCmdLine(
 *
 */
 void SfMain(
-	VOID
-	)
+    VOID
+)
 {
-	BOOL         cond = FALSE;
-	UINT         uResult = 0;
-	DWORD        dwTemp;
-	HANDLE       StdIn;
-	INPUT_RECORD inp1;
+    BOOL         cond = FALSE;
+    UINT         uResult = 0;
+    DWORD        dwTemp;
+    HANDLE       StdIn;
+    INPUT_RECORD inp1;
 
-	__security_init_cookie();
+    __security_init_cookie();
 
-	do {
+    do {
 
-		g_ConOut = GetStdHandle(STD_OUTPUT_HANDLE);
-		if (g_ConOut == INVALID_HANDLE_VALUE) {
-			uResult = (UINT)-1;
-			break;
-		}
+        g_ConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (g_ConOut == INVALID_HANDLE_VALUE) {
+            uResult = (UINT)-1;
+            break;
+        }
 
-		g_ConsoleOutput = TRUE;
-		if (!GetConsoleMode(g_ConOut, &dwTemp)) {
-			g_ConsoleOutput = FALSE;
-		}
-		
-		SetConsoleTitle(T_SFDECODETITLE);
-		SetConsoleMode(g_ConOut, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT);
-		if (g_ConsoleOutput == FALSE) {
-			WriteFile(g_ConOut, &g_BE, sizeof(WCHAR), &dwTemp, NULL);
-		}
+        g_ConsoleOutput = TRUE;
+        if (!GetConsoleMode(g_ConOut, &dwTemp)) {
+            g_ConsoleOutput = FALSE;
+        }
 
-		uResult = SfProcessCmdLine(GetCommandLine());
+        SetConsoleTitle(T_SFDECODETITLE);
+        SetConsoleMode(g_ConOut, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT);
+        if (g_ConsoleOutput == FALSE) {
+            WriteFile(g_ConOut, &g_BE, sizeof(WCHAR), &dwTemp, NULL);
+        }
 
-		if (g_ConsoleOutput) {
+        uResult = SfProcessCmdLine(GetCommandLine());
 
-			SfcuiPrintText(g_ConOut,
-				T_SFPRESSANYKEY,
-				TRUE, FALSE);
+        if (g_ConsoleOutput) {
 
-			StdIn = GetStdHandle(STD_INPUT_HANDLE);
-			if (StdIn != INVALID_HANDLE_VALUE) {
-				RtlSecureZeroMemory(&inp1, sizeof(inp1));
-				ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
-				ReadConsole(StdIn, &g_BE, sizeof(g_BE), &dwTemp, NULL);
-			}
-		}
+            SfcuiPrintText(g_ConOut,
+                T_SFPRESSANYKEY,
+                TRUE, FALSE);
 
-	} while (cond);
+            StdIn = GetStdHandle(STD_INPUT_HANDLE);
+            if (StdIn != INVALID_HANDLE_VALUE) {
+                RtlSecureZeroMemory(&inp1, sizeof(inp1));
+                ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
+                ReadConsole(StdIn, &g_BE, 1, &dwTemp, NULL);
+            }
+        }
 
-	ExitProcess(uResult);
+    } while (cond);
+
+    ExitProcess(uResult);
 }

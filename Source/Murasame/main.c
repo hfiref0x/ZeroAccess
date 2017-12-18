@@ -1,12 +1,12 @@
 /*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2016
+*  (C) COPYRIGHT AUTHORS, 2016 - 2017
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.01
+*  VERSION:     1.02
 *
-*  DATE:        20 Jan 2016
+*  DATE:        01 Dec 2017
 *
 *  Murasame program entry point.
 *
@@ -27,7 +27,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 
 HANDLE g_ConOut = NULL;
-WCHAR BE = 0xFEFF;
+WCHAR g_BE = 0xFEFF;
 BOOL g_ConsoleOutput = FALSE;
 
 #define T_SFEXTRACTTITLE L"Sirefef/ZeroAccess 3 extractor v1.0 (18/01/16)"
@@ -48,156 +48,156 @@ BOOL g_ConsoleOutput = FALSE;
 *
 */
 UINT SfExtractDropper(
-	LPWSTR lpCommandLine
-	)
+    LPWSTR lpCommandLine
+)
 {
-	BOOL                  cond = FALSE, bSuccess = FALSE;
-	ULONG                 c, uKey = 0, imagesz;
-	WCHAR                 szInputFile[MAX_PATH + 1];
-	WCHAR                 szOutputFile[MAX_PATH + 1];
-	WCHAR                 szKey[MAX_PATH];
-	PVOID                 ImageBase = NULL, EncryptedData = NULL, DecryptedData = NULL;
-	IStream              *pImageStream = NULL;
-	ULONG_PTR             gdiplusToken = 0;
-	GdiplusStartupInput   input;
-	GdiplusStartupOutput  output;
-	PVOID                 BitmapPtr = NULL;
-	GdiPlusBitmapData     BitmapData;
-	GdiPlusRect           rect;
-	SIZE_T                sz;
-	PULONG                ptr, i_ptr;
-	
-	//input file
-	c = 0;
-	RtlSecureZeroMemory(szInputFile, sizeof(szInputFile));
-	GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&szInputFile, MAX_PATH, &c);
-	if (c == 0) {
-		SfcuiPrintText(g_ConOut,
-			T_SFEXTRACTUSAGE,
-			g_ConsoleOutput, FALSE);
-		return (UINT)-1;
-	}
+    BOOL                  cond = FALSE, bSuccess = FALSE;
+    ULONG                 c, uKey = 0, imagesz;
+    WCHAR                 szInputFile[MAX_PATH + 1];
+    WCHAR                 szOutputFile[MAX_PATH + 1];
+    WCHAR                 szKey[MAX_PATH];
+    PVOID                 ImageBase = NULL, EncryptedData = NULL, DecryptedData = NULL;
+    IStream              *pImageStream = NULL;
+    ULONG_PTR             gdiplusToken = 0;
+    GdiplusStartupInput   input;
+    GdiplusStartupOutput  output;
+    PVOID                 BitmapPtr = NULL;
+    GdiPlusBitmapData     BitmapData;
+    GdiPlusRect           rect;
+    SIZE_T                sz;
+    PULONG                ptr, i_ptr;
 
-	//output file
-	c = 0;
-	RtlSecureZeroMemory(&szOutputFile, sizeof(szOutputFile));
-	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szOutputFile, MAX_PATH, &c);
-	if (c == 0) {
-		_strcpy(szOutputFile, TEXT("extracted.bin"));
-	}
+    //input file
+    c = 0;
+    RtlSecureZeroMemory(szInputFile, sizeof(szInputFile));
+    GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&szInputFile, MAX_PATH, &c);
+    if (c == 0) {
+        SfcuiPrintText(g_ConOut,
+            T_SFEXTRACTUSAGE,
+            g_ConsoleOutput, FALSE);
+        return (UINT)-1;
+    }
 
-	//key
-	c = 0;
-	RtlSecureZeroMemory(&szKey, sizeof(szKey));
-	GetCommandLineParam(lpCommandLine, 3, (LPWSTR)&szKey, MAX_PATH, &c);
-	if ((c == 0) || (c > 10)) {
-		SfcuiPrintText(g_ConOut,
-			T_SFEXTRACTUSAGE,
-			g_ConsoleOutput, FALSE);
-		return (UINT)-1;
-	}
+    //output file
+    c = 0;
+    RtlSecureZeroMemory(&szOutputFile, sizeof(szOutputFile));
+    GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szOutputFile, MAX_PATH, &c);
+    if (c == 0) {
+        _strcpy(szOutputFile, TEXT("extracted.bin"));
+    }
 
-	c = 0;
-	if (locase_w(szKey[1]) == 'x') {
-		c = 2;
-	} 
-	uKey = hextoul(&szKey[c]);
+    //key
+    c = 0;
+    RtlSecureZeroMemory(&szKey, sizeof(szKey));
+    GetCommandLineParam(lpCommandLine, 3, (LPWSTR)&szKey, MAX_PATH, &c);
+    if ((c == 0) || (c > 10)) {
+        SfcuiPrintText(g_ConOut,
+            T_SFEXTRACTUSAGE,
+            g_ConsoleOutput, FALSE);
+        return (UINT)-1;
+    }
 
-	do {
+    c = 0;
+    if (locase_w(szKey[1]) == 'x') {
+        c = 2;
+    }
+    uKey = hextoul(&szKey[c]);
 
-		ImageBase = SfuCreateFileMappingNoExec(szInputFile);
-		if (ImageBase == NULL)
-			break;
+    do {
 
-		c = 0;
-		EncryptedData = SfLdrQueryResourceData(1, ImageBase, &c);
-		if ((EncryptedData == NULL) || (c == 0))
-			break;
+        ImageBase = SfuCreateFileMappingNoExec(szInputFile);
+        if (ImageBase == NULL)
+            break;
 
-		pImageStream = SHCreateMemStream((BYTE *)EncryptedData, (UINT)c);
-		if (pImageStream == NULL)
-			break;
+        c = 0;
+        EncryptedData = SfLdrQueryResourceData(1, ImageBase, &c);
+        if ((EncryptedData == NULL) || (c == 0))
+            break;
 
-		RtlSecureZeroMemory(&input, sizeof(input));
-		RtlSecureZeroMemory(&output, sizeof(output));
-		input.GdiplusVersion = 1;
+        pImageStream = SHCreateMemStream((BYTE *)EncryptedData, (UINT)c);
+        if (pImageStream == NULL)
+            break;
 
-		if (GdiplusStartup(&gdiplusToken, &input, &output) != GdiplusOk)
-			break;
+        RtlSecureZeroMemory(&input, sizeof(input));
+        RtlSecureZeroMemory(&output, sizeof(output));
+        input.GdiplusVersion = 1;
 
-		BitmapPtr = NULL;
-		if (GdipCreateBitmapFromStream(pImageStream, &BitmapPtr) != GdiplusOk)
-			break;
+        if (GdiplusStartup(&gdiplusToken, &input, &output) != GdiplusOk)
+            break;
 
-		RtlSecureZeroMemory(&rect, sizeof(rect));
-		
-		if (
-			(GdipGetImageWidth(BitmapPtr, (UINT *)&rect.Width) == GdiplusOk) &&
-			(GdipGetImageHeight(BitmapPtr, (UINT *)&rect.Height) == GdiplusOk)
-			)
-		{
-			RtlSecureZeroMemory(&BitmapData, sizeof(BitmapData));
-			if (GdipBitmapLockBits(BitmapPtr, &rect, ImageLockModeRead, PixelFormat32bppARGB, &BitmapData) == GdiplusOk) {
+        BitmapPtr = NULL;
+        if (GdipCreateBitmapFromStream(pImageStream, &BitmapPtr) != GdiplusOk)
+            break;
 
-				c = (rect.Width * rect.Height);
-				
-				imagesz = sizeof(ULONG) * c;
-				sz = imagesz;
-				DecryptedData = NULL;
-				NtAllocateVirtualMemory(NtCurrentProcess(), &DecryptedData, 0, &sz, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-				if (DecryptedData) {
-					
-					i_ptr = (PULONG)BitmapData.Scan0;
-					ptr = DecryptedData;				
-					while (c > 0) {
-						*ptr = *i_ptr ^ uKey;
-						ptr++;
-						i_ptr++;
-						c--;
-					}
+        RtlSecureZeroMemory(&rect, sizeof(rect));
 
-					bSuccess = (SfuWriteBufferToFile(szOutputFile, DecryptedData, imagesz, FALSE, FALSE) == imagesz);
+        if (
+            (GdipGetImageWidth(BitmapPtr, (UINT *)&rect.Width) == GdiplusOk) &&
+            (GdipGetImageHeight(BitmapPtr, (UINT *)&rect.Height) == GdiplusOk)
+            )
+        {
+            RtlSecureZeroMemory(&BitmapData, sizeof(BitmapData));
+            if (GdipBitmapLockBits(BitmapPtr, &rect, ImageLockModeRead, PixelFormat32bppARGB, &BitmapData) == GdiplusOk) {
 
-					sz = 0;
-					NtFreeVirtualMemory(NtCurrentProcess(), &DecryptedData, &sz, MEM_RELEASE);
-				}
-				GdipBitmapUnlockBits(BitmapPtr, &BitmapData);
-			}
-		}
+                c = (rect.Width * rect.Height);
 
-	} while (cond);
+                imagesz = sizeof(ULONG) * c;
+                sz = imagesz;
+                DecryptedData = NULL;
+                NtAllocateVirtualMemory(NtCurrentProcess(), &DecryptedData, 0, &sz, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+                if (DecryptedData) {
 
-	if (bSuccess == FALSE) {
-		SfcuiPrintText(g_ConOut,
-			T_SFEXTRACTFAIL,
-			g_ConsoleOutput, FALSE);
-	}
-	else
-	{
-		SfcuiPrintText(g_ConOut,
-			szOutputFile,
-			g_ConsoleOutput, TRUE);
-		SfcuiPrintText(g_ConOut,
-			T_SFEXTRACTED,
-			g_ConsoleOutput, TRUE);
-	}
+                    i_ptr = (PULONG)BitmapData.Scan0;
+                    ptr = DecryptedData;
+                    while (c > 0) {
+                        *ptr = *i_ptr ^ uKey;
+                        ptr++;
+                        i_ptr++;
+                        c--;
+                    }
 
-	if (BitmapPtr != NULL) {
-		GdipDisposeImage(&BitmapPtr);
-	}
+                    bSuccess = (SfuWriteBufferToFile(szOutputFile, DecryptedData, imagesz, FALSE, FALSE) == imagesz);
 
-	if (gdiplusToken != 0) {
-		GdiplusShutdown(gdiplusToken);
-	}
+                    sz = 0;
+                    NtFreeVirtualMemory(NtCurrentProcess(), &DecryptedData, &sz, MEM_RELEASE);
+                }
+                GdipBitmapUnlockBits(BitmapPtr, &BitmapData);
+            }
+        }
 
-	if (pImageStream != NULL) {
-		pImageStream->lpVtbl->Release(pImageStream);
-	}
+    } while (cond);
 
-	if (ImageBase != NULL) {
-		NtUnmapViewOfSection(NtCurrentProcess(), ImageBase);
-	}
-	return 0;
+    if (bSuccess == FALSE) {
+        SfcuiPrintText(g_ConOut,
+            T_SFEXTRACTFAIL,
+            g_ConsoleOutput, FALSE);
+    }
+    else
+    {
+        SfcuiPrintText(g_ConOut,
+            szOutputFile,
+            g_ConsoleOutput, TRUE);
+        SfcuiPrintText(g_ConOut,
+            T_SFEXTRACTED,
+            g_ConsoleOutput, TRUE);
+    }
+
+    if (BitmapPtr != NULL) {
+        GdipDisposeImage(&BitmapPtr);
+    }
+
+    if (gdiplusToken != 0) {
+        GdiplusShutdown(gdiplusToken);
+    }
+
+    if (pImageStream != NULL) {
+        pImageStream->lpVtbl->Release(pImageStream);
+    }
+
+    if (ImageBase != NULL) {
+        NtUnmapViewOfSection(NtCurrentProcess(), ImageBase);
+    }
+    return 0;
 }
 
 /*
@@ -209,60 +209,60 @@ UINT SfExtractDropper(
 *
 */
 void SfMain(
-	VOID
-	)
+    VOID
+)
 {
-	BOOL         cond = FALSE;
-	UINT         uResult = 0;
-	DWORD        dwTemp;
-	HANDLE       StdIn;
-	INPUT_RECORD inp1;
+    BOOL         cond = FALSE;
+    UINT         uResult = 0;
+    DWORD        dwTemp;
+    HANDLE       StdIn;
+    INPUT_RECORD inp1;
 
-	__security_init_cookie();
+    __security_init_cookie();
 
-	do {
+    do {
 
-		g_ConOut = GetStdHandle(STD_OUTPUT_HANDLE);
-		if (g_ConOut == INVALID_HANDLE_VALUE) {
-			uResult = (UINT)-1;
-			break;
-		}
+        g_ConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (g_ConOut == INVALID_HANDLE_VALUE) {
+            uResult = (UINT)-1;
+            break;
+        }
 
-		g_ConsoleOutput = TRUE;
-		if (!GetConsoleMode(g_ConOut, &dwTemp)) {
-			g_ConsoleOutput = FALSE;
-		}
+        g_ConsoleOutput = TRUE;
+        if (!GetConsoleMode(g_ConOut, &dwTemp)) {
+            g_ConsoleOutput = FALSE;
+        }
 
-		SetConsoleTitle(T_SFEXTRACTTITLE);
-		SetConsoleMode(g_ConOut, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT);
-		if (g_ConsoleOutput == FALSE) {
-			WriteFile(g_ConOut, &BE, sizeof(WCHAR), &dwTemp, NULL);
-		}
+        SetConsoleTitle(T_SFEXTRACTTITLE);
+        SetConsoleMode(g_ConOut, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT);
+        if (g_ConsoleOutput == FALSE) {
+            WriteFile(g_ConOut, &g_BE, sizeof(WCHAR), &dwTemp, NULL);
+        }
 
-		if (SfInitGdiPlus()) {
-			uResult = SfExtractDropper(GetCommandLine());
-		}
-		else {
-			SfcuiPrintText(g_ConOut,
-				T_SFINITFAILED,
-				g_ConsoleOutput, FALSE);
-		}
+        if (SfInitGdiPlus()) {
+            uResult = SfExtractDropper(GetCommandLine());
+        }
+        else {
+            SfcuiPrintText(g_ConOut,
+                T_SFINITFAILED,
+                g_ConsoleOutput, FALSE);
+        }
 
-		if (g_ConsoleOutput) {
+        if (g_ConsoleOutput) {
 
-			SfcuiPrintText(g_ConOut,
-				T_SFPRESSANYKEY,
-				TRUE, FALSE);
+            SfcuiPrintText(g_ConOut,
+                T_SFPRESSANYKEY,
+                TRUE, FALSE);
 
-			StdIn = GetStdHandle(STD_INPUT_HANDLE);
-			if (StdIn != INVALID_HANDLE_VALUE) {
-				RtlSecureZeroMemory(&inp1, sizeof(inp1));
-				ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
-				ReadConsole(StdIn, &BE, sizeof(BE), &dwTemp, NULL);
-			}
-		}
+            StdIn = GetStdHandle(STD_INPUT_HANDLE);
+            if (StdIn != INVALID_HANDLE_VALUE) {
+                RtlSecureZeroMemory(&inp1, sizeof(inp1));
+                ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
+                ReadConsole(StdIn, &g_BE, 1, &dwTemp, NULL);
+            }
+        }
 
-	} while (cond);
+    } while (cond);
 
-	ExitProcess(uResult);
+    ExitProcess(uResult);
 }

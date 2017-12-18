@@ -1,12 +1,12 @@
 /*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2016
+*  (C) COPYRIGHT AUTHORS, 2016 - 2017
 *
 *  TITLE:       MAIN.C
 *
-*  VERSION:     1.01
+*  VERSION:     1.02
 *
-*  DATE:        20 Jan 2016
+*  DATE:        01 Dec 2017
 *
 *  Harusame program entry point.
 *
@@ -22,7 +22,7 @@
 #include "..\shared\za_rkey.h"
 
 HANDLE g_ConOut = NULL;
-WCHAR BE = 0xFEFF;
+WCHAR g_BE = 0xFEFF;
 BOOL g_ConsoleOutput = FALSE;
 
 #define T_SFCHECKTTITLE  L"Sirefef/ZeroAccess 3 file checker v1.0 (14/01/16)"
@@ -42,90 +42,90 @@ BOOL g_ConsoleOutput = FALSE;
 *
 */
 UINT SfProcessCmdLine(
-	LPWSTR lpCommandLine
-	)
+    LPWSTR lpCommandLine
+)
 {
-	ULONG        rlen, uMode = 32;
-	WCHAR        szInputFile[MAX_PATH + 1];
-	WCHAR        szMode[MAX_PATH + 1];
-	NTSTATUS     status;
-	PBYTE        pKey;
-	ULONG        KeySize;
+    ULONG        rlen, uMode = 32;
+    WCHAR        szInputFile[MAX_PATH + 1];
+    WCHAR        szMode[MAX_PATH + 1];
+    NTSTATUS     status;
+    PBYTE        pKey;
+    ULONG        KeySize;
 
-	//path
-	rlen = 0;
-	RtlSecureZeroMemory(szInputFile, sizeof(szInputFile));
-	GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&szInputFile, MAX_PATH, &rlen);
-	if (rlen == 0) {
-		SfcuiPrintText(g_ConOut,
-			T_SFCHECKUSAGE,
-			g_ConsoleOutput, FALSE);
-		return (UINT)-1;
-	}
+    //path
+    rlen = 0;
+    RtlSecureZeroMemory(szInputFile, sizeof(szInputFile));
+    GetCommandLineParam(lpCommandLine, 1, (LPWSTR)&szInputFile, MAX_PATH, &rlen);
+    if (rlen == 0) {
+        SfcuiPrintText(g_ConOut,
+            T_SFCHECKUSAGE,
+            g_ConsoleOutput, FALSE);
+        return (UINT)-1;
+    }
 
-	//type
-	rlen = 0;
-	RtlSecureZeroMemory(&szMode, sizeof(szMode));
-	GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, MAX_PATH, &rlen);
-	if (rlen == 0) {
-		uMode = 32;
-	}
-	else {
-		uMode = strtoul(szMode);
-		if (uMode != 32 && uMode != 64) {
+    //type
+    rlen = 0;
+    RtlSecureZeroMemory(&szMode, sizeof(szMode));
+    GetCommandLineParam(lpCommandLine, 2, (LPWSTR)&szMode, MAX_PATH, &rlen);
+    if (rlen == 0) {
+        uMode = 32;
+    }
+    else {
+        uMode = strtoul(szMode);
+        if (uMode != 32 && uMode != 64) {
 
-			SfcuiPrintText(g_ConOut,
-				T_SFCHECKMODE,
-				g_ConsoleOutput, FALSE);
+            SfcuiPrintText(g_ConOut,
+                T_SFCHECKMODE,
+                g_ConsoleOutput, FALSE);
 
-			return (UINT)-2;
-		}
-	}
+            return (UINT)-2;
+        }
+    }
 
-	pKey = (PBYTE)&ZA_key32;
-	KeySize = sizeof(ZA_key32);
+    pKey = (PBYTE)&ZA_key32;
+    KeySize = sizeof(ZA_key32);
 
-	if (uMode == 64) {
-		pKey = (PBYTE)&ZA_key64;
-		KeySize = sizeof(ZA_key64);
-	}
+    if (uMode == 64) {
+        pKey = (PBYTE)&ZA_key64;
+        KeySize = sizeof(ZA_key64);
+    }
 
-	status = SfcIsFileLegit(szInputFile, pKey, KeySize);
+    status = SfcIsFileLegit(szInputFile, pKey, KeySize);
 
-	//print result
-	SfcuiPrintText(g_ConOut,
-		szInputFile,
-		g_ConsoleOutput, TRUE);
+    //print result
+    SfcuiPrintText(g_ConOut,
+        szInputFile,
+        g_ConsoleOutput, TRUE);
 
-	_strcpy(szMode, TEXT("Verification mode: "));
-	ultostr(uMode, _strend(szMode));
-	_strcat(szMode, TEXT("\r\n"));
-	SfcuiPrintText(g_ConOut,
-		szMode,
-		g_ConsoleOutput, TRUE);
+    _strcpy(szMode, TEXT("Verification mode: "));
+    ultostr(uMode, _strend(szMode));
+    _strcat(szMode, TEXT("\r\n"));
+    SfcuiPrintText(g_ConOut,
+        szMode,
+        g_ConsoleOutput, TRUE);
 
-	switch (status) {
+    switch (status) {
 
-	case STATUS_EA_LIST_INCONSISTENT:
-		SfcuiPrintText(g_ConOut,
-			T_SFEAFAILURE,
-			g_ConsoleOutput, TRUE);
-		break;
+    case STATUS_EA_LIST_INCONSISTENT:
+        SfcuiPrintText(g_ConOut,
+            T_SFEAFAILURE,
+            g_ConsoleOutput, TRUE);
+        break;
 
-	case STATUS_SUCCESS:
-		SfcuiPrintText(g_ConOut,
-			T_SFCHECKED,
-			g_ConsoleOutput, TRUE);
-		break;
+    case STATUS_SUCCESS:
+        SfcuiPrintText(g_ConOut,
+            T_SFCHECKED,
+            g_ConsoleOutput, TRUE);
+        break;
 
-	default:
-		SfcuiPrintText(g_ConOut,
-			T_SFCHECKFAIL,
-			g_ConsoleOutput, TRUE);
-		break;
-	}
+    default:
+        SfcuiPrintText(g_ConOut,
+            T_SFCHECKFAIL,
+            g_ConsoleOutput, TRUE);
+        break;
+    }
 
-	return (NT_SUCCESS(status));
+    return (NT_SUCCESS(status));
 }
 
 /*
@@ -137,58 +137,58 @@ UINT SfProcessCmdLine(
 *
 */
 void SfMain(
-	VOID
-	)
+    VOID
+)
 {
-	BOOL         cond = FALSE;
-	UINT         uResult = 0;
-	DWORD        dwTemp;
-	HANDLE       StdIn;
-	INPUT_RECORD inp1;
+    BOOL         cond = FALSE;
+    UINT         uResult = 0;
+    DWORD        dwTemp;
+    HANDLE       StdIn;
+    INPUT_RECORD inp1;
 
-	__security_init_cookie();
+    __security_init_cookie();
 
-	do {
+    do {
 
-		if (!SfInitMD5()) {
-			uResult = (UINT)-1;
-			break;
-		}
+        if (!SfInitMD5()) {
+            uResult = (UINT)-1;
+            break;
+        }
 
-		g_ConOut = GetStdHandle(STD_OUTPUT_HANDLE);
-		if (g_ConOut == INVALID_HANDLE_VALUE) {
-			uResult = (UINT)-2;
-			break;
-		}
+        g_ConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (g_ConOut == INVALID_HANDLE_VALUE) {
+            uResult = (UINT)-2;
+            break;
+        }
 
-		g_ConsoleOutput = TRUE;
-		if (!GetConsoleMode(g_ConOut, &dwTemp)) {
-			g_ConsoleOutput = FALSE;
-		}
+        g_ConsoleOutput = TRUE;
+        if (!GetConsoleMode(g_ConOut, &dwTemp)) {
+            g_ConsoleOutput = FALSE;
+        }
 
-		SetConsoleTitle(T_SFCHECKTTITLE);
-		SetConsoleMode(g_ConOut, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT);
-		if (g_ConsoleOutput == FALSE) {
-			WriteFile(g_ConOut, &BE, sizeof(WCHAR), &dwTemp, NULL);
-		}
+        SetConsoleTitle(T_SFCHECKTTITLE);
+        SetConsoleMode(g_ConOut, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT);
+        if (g_ConsoleOutput == FALSE) {
+            WriteFile(g_ConOut, &g_BE, sizeof(WCHAR), &dwTemp, NULL);
+        }
 
-		uResult = SfProcessCmdLine(GetCommandLine());
+        uResult = SfProcessCmdLine(GetCommandLine());
 
-		if (g_ConsoleOutput) {
+        if (g_ConsoleOutput) {
 
-			SfcuiPrintText(g_ConOut,
-				T_SFPRESSANYKEY,
-				TRUE, FALSE);
+            SfcuiPrintText(g_ConOut,
+                T_SFPRESSANYKEY,
+                TRUE, FALSE);
 
-			StdIn = GetStdHandle(STD_INPUT_HANDLE);
-			if (StdIn != INVALID_HANDLE_VALUE) {
-				RtlSecureZeroMemory(&inp1, sizeof(inp1));
-				ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
-				ReadConsole(StdIn, &BE, sizeof(BE), &dwTemp, NULL);
-			}
-		}
+            StdIn = GetStdHandle(STD_INPUT_HANDLE);
+            if (StdIn != INVALID_HANDLE_VALUE) {
+                RtlSecureZeroMemory(&inp1, sizeof(inp1));
+                ReadConsoleInput(StdIn, &inp1, 1, &dwTemp);
+                ReadConsole(StdIn, &g_BE, 1, &dwTemp, NULL);
+            }
+        }
 
-	} while (cond);
+    } while (cond);
 
-	ExitProcess(uResult);
+    ExitProcess(uResult);
 }

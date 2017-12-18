@@ -24,4 +24,4 @@ wchar_t *_filepath_w(const wchar_t *fname, wchar_t *fpath);
 #define _filename_noext  _filename_noext_a
 #endif
 
-#endif /* _CMDLINEH_ */
+#endif /* _FILENAMEH_ */

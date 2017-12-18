@@ -1,12 +1,12 @@
 /*******************************************************************************
 *
-*  (C) COPYRIGHT AUTHORS, 2016
+*  (C) COPYRIGHT AUTHORS, 2016 - 2017
 *
 *  TITLE:       P2P.H
 *
-*  VERSION:     1.00
+*  VERSION:     1.01
 *
-*  DATE:        18 Jan 2016
+*  DATE:        01 Dec 2016
 *
 *  P2P header file.
 *
@@ -25,7 +25,7 @@
 
 #define UDP_BUFFER_SIZE		        4096
 #define MAXIMUM_FILES               32
-#define RECV_BUFFER_SIZE            256*1024
+#define RECV_BUFFER_SIZE            262144
 
 //client udp port
 
@@ -81,25 +81,25 @@
 #endif
 
 typedef struct _ZA_SCANCTX {
-	SOCKET              su;
-	ULONG               NumberOfFiles;
-	ULONG               SessionId;
-	HCRYPTPROV          CryptoProv;
-	HCRYPTKEY           CryptoKey;
-	HANDLE              DumpFileHandle;
-	HANDLE              RootDirectoryHandle;
-	CRITICAL_SECTION    csTableLock;
-	CRITICAL_SECTION    csTableDumpLock;
-	RTL_AVL_TABLE       PeersTable;
-	RTL_AVL_TABLE       PeersTableDump;
-	ZA_PEERINFO	        LastPeerList[16];
-	ZA_FILEHEADER       FileHeaders[MAXIMUM_FILES];
+    SOCKET              su;
+    ULONG               NumberOfFiles;
+    ULONG               SessionId;
+    HCRYPTPROV          CryptoProv;
+    HCRYPTKEY           CryptoKey;
+    HANDLE              DumpFileHandle;
+    HANDLE              RootDirectoryHandle;
+    CRITICAL_SECTION    csTableLock;
+    CRITICAL_SECTION    csTableDumpLock;
+    RTL_AVL_TABLE       PeersTable;
+    RTL_AVL_TABLE       PeersTableDump;
+    ZA_PEERINFO	        LastPeerList[16];
+    ZA_FILEHEADER       FileHeaders[MAXIMUM_FILES];
 } ZA_SCANCTX, *PZA_SCANCTX;
 
 BOOL SfNStartup(
-	_In_ ZA_SCANCTX *ScanContext
-	);
+    _In_ ZA_SCANCTX *ScanContext
+);
 
 VOID SfNMain(
-	VOID
-	);
+    VOID
+);
